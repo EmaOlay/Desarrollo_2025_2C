@@ -1,11 +1,11 @@
-@startuml Starbucks_Poliglota_Definitiva
+@startuml
 skinparam linetype ortho
 skinparam Entity {
   BorderColor black
   FontName Arial
 }
 
-' 1. Definición de Estereotipos para DBs
+' 1. Capa Relacional (MySQL - Datos Maestros/Referenciales)
 entity Cliente <<(C,#ADD8E6) MySQL>> {
   id : int <<PK>>
   --
@@ -25,7 +25,6 @@ entity Sucursal <<(S,#ADD8E6) MySQL>> {
   direccion : string
   horario : string
   capacidad : int
-  
 }
 
 entity Promocion <<(P,#ADD8E6) MySQL>> {
@@ -42,7 +41,7 @@ entity Producto <<(R,#ADD8E6) MySQL>> {
   --
   nombre : string
   precio : double
-  tipo_id: int 
+  tipo_id: int <<FK>>
 }
 
 entity Tipo_Producto <<(R,#ADD8E6) MySQL>> {
@@ -59,48 +58,83 @@ entity Stock <<(S,#ADD8E6) MySQL>> {
   cantidad : int
 }
 
-' 2. Entidad Transaccional (MongoDB)
+' 2. Capa Transaccional y Operacional DENORMALIZADA (MongoDB)
 entity Ticket <<(T,#90EE90) MongoDB>> {
   ticket_id : string <<PK>>
   --
-  cliente_id : int <<FK_MySQL>>
-  sucursal_id : int <<FK_MySQL>>
+  cliente_id : int <<FK_MySQL>> (Solo para lineage)
+  cliente_nombre : string <<Embedded>>
+  sucursal_id : int <<FK_MySQL>> (Solo para lineage)
+  sucursal_ciudad : string <<Embedded>>
   fecha : date
   total : double
   metodo_pago : string
   promocion_id : int <<FK_MySQL>> (opcional)
-  **detalles : [DetalleTicket]**
+  nombre_promocion : string <<Embedded>>
+  detalles_json : JSON <<Embedded>> ' representacion simplificada
 }
 
-' 3. Entidad Analítica (Cassandra)
+entity Interaccion <<(I,#90EE90) MongoDB>> {
+  _id : ObjectId <<PK>>
+  --
+  cliente_id : int <<FK_MySQL>> (Solo para lineage)
+  cliente_email : string <<Embedded>>
+  tipo_evento : string
+  fecha : ISODate
+  metadata_json : JSON <<Embedded>> ' representacion simplificada
+}
+
+entity Canje <<(E,#90EE90) MongoDB>> {
+  _id : ObjectId <<PK>>
+  --
+  cliente_id : int <<FK_MySQL>> (Solo para lineage)
+  cliente_stars_antes : int <<Embedded>>
+  fecha_canje : ISODate
+  stars_usadas : int
+  item_canjeado : string
+  valor_estimado : double <<Embedded>>
+}
+
+entity MenuDiaCache <<(M,#90EE90) MongoDB>> {
+  _id : ObjectId <<PK>>
+  --
+  sucursal_id : int <<FK_MySQL>> (Solo para refresco)
+  fecha_creacion : ISODate <<TTL 1 Hora>>
+  productos_json : JSON <<Embedded>> ' representacion simplificada
+}
+
+' 3. Entidades Analíticas (Cassandra & Neo4j)
 entity HistorialCompra <<(H,#FFDAB9) Cassandra>> {
   idCliente : int <<PK, Partition Key>>
-  fecha : datetime <<PK, Clustering Key>>
   --
+  fecha : datetime <<PK, Clustering Key>>
   idTicket : string
   total : double
 }
 
-' 4. Entidad de Relación (Neo4j)
 entity RedSocial <<(N,#FFC0CB) Neo4j>> {
   id : int <<PK>>
   --
   nombre : string
 }
 
-' 5. Relaciones
-Cliente "1" -- "N" Ticket : genera
-Sucursal "1" -- "N" Ticket : emite
+' ------------------------------------------------------------------
+' 4. Relaciones
+' ------------------------------------------------------------------
 
+Tipo_Producto "1" -- "N" Producto : pertenece_a
 Sucursal "1" -- "N" Stock : posee
 Producto "1" -- "N" Stock : disponible_en
-Tipo_Producto "1" -- "N" Producto : pertenece_a
 
+Cliente "1" -- "N" Ticket : genera
+Sucursal "1" -- "N" Ticket : emite
 Promocion "0..1" -- "N" Ticket : aplicada_a
 
-Cliente "1" -- "N" HistorialCompra : registra
+Cliente "1" -- "N" Interaccion : registra_evento
+Cliente "1" -- "N" Canje : registra_lealtad
+Sucursal "1" -- "N" MenuDiaCache : publica_menu
 
-' Relación Gráfica (Neo4j)
-Cliente "N" -- "N" RedSocial : SIGUE
+Cliente "1" -- "N" HistorialCompra : registra (Cassandra)
+Cliente "N" -- "N" RedSocial : SIGUE (Neo4j)
 
 @enduml
