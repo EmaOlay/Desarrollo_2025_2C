@@ -4,7 +4,7 @@ import json
 import re
 
 # --- CONFIGURACIÓN ---
-MONGO_QUERY_FILE = "/app/queries/consulta_tickets_cliente.js"
+MONGO_QUERY_FILE = "/app/queries/Auxiliares(no ejecutar directamente)/consulta_tickets_cliente.js"
 MONGO_CONN = "mongosh mongodb://mongodb:27017/starbucks_transactions -u rootuser -p rootpassword --authenticationDatabase admin --quiet"
 
 def run_command(command, input_data=None):

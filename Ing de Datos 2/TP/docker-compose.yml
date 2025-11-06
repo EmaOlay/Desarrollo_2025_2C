@@ -108,6 +108,7 @@ services:
       dockerfile: Dockerfile
     # Montamos la carpeta de scripts de consultas para que el CLI pueda acceder a ellos
     volumes:
+      - ./cli:/app
       - ./queries:/app/queries
     # Le damos acceso a la red para que pueda ejecutar comandos en todas las DBs
     depends_on:

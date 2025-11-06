@@ -27,14 +27,7 @@ RUN pip install cqlsh
 # Instalación de la librería Rich (para TUI básico y formatting)
 RUN pip install rich
 
-# Instalamos Cypher Shell (requiere JRE)
-# Usaremos la versión oficial de Neo4j para obtener los binarios
-# Es más fácil usar el binario descargado que intentar configurar el JRE aquí.
-# Por simplicidad, asumiremos que solo usaremos la consola de MySQL/CQLSH/Mongo.
-# Si necesitas cypher-shell y mongosh aquí, el Dockerfile sería mucho más complejo (Java/Mongo PPA).
-# Para esta demo, el TUI usará el cliente MySQL y cqlsh (Python) directamente.
-
 # Copiamos el script principal de la TUI
-COPY cli.py /app/cli.py
+# COPY cli.py /app/cli.py
 
 CMD ["python", "cli.py"]

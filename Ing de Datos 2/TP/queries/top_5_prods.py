@@ -4,7 +4,7 @@ import sys
 import re # ¡Nuevo! Importamos el módulo de expresiones regulares
 
 # --- CONFIGURACIÓN ---
-MONGO_QUERY_FILE = "/app/queries/mongo_query_top5.js"
+MONGO_QUERY_FILE = "/app/queries/Auxiliares(no ejecutar directamente)/mongo_query_top5.js"
 
 # --- CONFIGURACIÓN DE CONEXIÓN ---
 MYSQL_CONN = "mysql -h mysql -u root -proot_password my_data_warehouse --skip-column-names --batch --skip-ssl"
