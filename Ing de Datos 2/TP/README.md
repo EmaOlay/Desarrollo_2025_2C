@@ -24,50 +24,48 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 ## 📦 Estructura del Proyecto
 
 ```
-# Estructura del Repositorio
-
-Este repositorio contiene la arquitectura de un proyecto políglota, utilizando diferentes tecnologías de base de datos (MySQL, MongoDB, Cassandra, Neo4j, Redis) y una Interfaz de Línea de Comandos (CLI) desarrollada en Python.
-
-## 🗂️ Árbol de Directorios
-
-El árbol de directorios refleja una estructura más organizada, separando las consultas de soporte de las principales, e introduciendo la navegación por carpetas en la CLI.
-
-| Ruta | Descripción |
-| :--- | :--- |
-| **TP/** | **Directorio raíz del proyecto.** |
-| ├── `casos_de_uso.txt` | Documento de texto que detalla los requisitos o casos de uso implementados y/o planificados para el proyecto. |
-| **├── cli/** | Contiene los archivos para el servicio de **Interfaz de Línea de Comandos (TUI)**. |
-| │   ├── `cli_v2.py` | **Nueva Lógica Principal de la TUI.** Implementa la navegación por directorios para organizar las consultas. |
-| │   ├── `Dockerfile` | Define la imagen de Docker para el entorno CLI. |
-| │   └── `queries` | **Carpeta vacía.** Se usa como punto de montaje para sincronizar las consultas del host, aunque la CLI apunta a `/app/queries` (la carpeta principal). |
-| **├── DER.png** | Diagrama Entidad-Relación (DER) del esquema relacional. |
-| **├── DER.puml** | Archivo fuente en PlantUML para la generación del DER. |
-| **├── docker-compose.yml** | Archivo de orquestación de Docker que define y conecta todos los servicios de la arquitectura políglota. |
-| **├── queries/** | **Contenedor principal de scripts y consultas.** Ahora estructurado con subcarpetas para mejor organización. |
-| │   ├── **Auxiliares(no ejecutar directamente)** | Scripts de base de datos que están diseñados para ser **inyectados o llamados por scripts Python** (lógica políglota), no directamente por el usuario. |
-| │   │   ├── `consulta_tickets_cliente.js` | Script de MongoDB que consulta tickets, utilizado por `pedidos_cliente_septiembre.py`. |
-| │   │   └── `mongo_query_top5.js` | Script de MongoDB que calcula el Top 5 de productos vendidos, utilizado por `top_5_prods.py`. |
-| │   ├── `bebidas_precio_mas5.sql` | Consulta SQL (ejemplo de consulta directa) |
-| │   ├── **`pedidos_cliente_septiembre.py`** | Script de lógica políglota que pide un `clienteId` y consulta sus transacciones de Septiembre en MongoDB. |
-| │   ├── **`Practica Examen`** | Directorio para consultas preparadas para escenarios de evaluación o prueba. |
-| │   ├── `promociones_activas_hoy.sql` | Consulta SQL (ejemplo de consulta directa) |
-| │   ├── **`Pruebas`** | Directorio para scripts de prueba básicos en cada base de datos. |
-| │   │   ├── `prueba_cassandra.cql` | Script de prueba para Cassandra. |
-| │   │   ├── `prueba_mongodb.js` | Script de prueba para MongoDB. |
-| │   │   ├── `prueba_mysql.sql` | Script de prueba para MySQL. |
-| │   │   └── `prueba_neo4j.cypher` | Script de prueba para Neo4j. |
-| │   ├── `ranking_clientes_stars.sql` | Consulta SQL para obtener el ranking de clientes con más *Stars* acumuladas (requiere el campo agregado en la tabla `Cliente`). |
-| │   └── **`top_5_prods.py`** | Script de lógica políglota: coordina MySQL (Sucursales) y MongoDB (Ventas). |
-| **├── README.md** | Documentación principal del proyecto. |
-| **└── setup/** | Lógica y scripts para la **inicialización y carga de datos** de las bases de datos. |
-|    ├── `01_mysql_init.sql` | Inicialización de MySQL. |
-|    ├── `02_mongodb_init.js` | Inicialización de MongoDB. |
-|    ├── `03_cassandra_init.cql` | Inicialización de Cassandra. |
-|    ├── `04_neo4j_init.cypher` | Inicialización de Neo4j. |
-|    ├── `05_redis_config.conf` | Archivo de configuración para Redis. |
-|    ├── `Dockerfile` | Dockerfile para el servicio de `setup`. |
-|    ├── `init_all_dbs.sh` | Script maestro de inicialización. |
-|    └── `wait-for-it.sh` | Script auxiliar para esperar la disponibilidad de los servicios. |
+├── TP/
+│
+├── casos_de_uso.txt            # Documento que detalla los requisitos y casos de uso.
+│
+├── cli/                        # Entorno y código de la Interfaz TUI (Terminal User Interface).
+│   ├── cli_v2.py               # Lógica principal de la TUI, ahora con **navegación por directorios**.
+│   ├── Dockerfile              # Define la imagen para el servicio CLI.
+│   └── queries/                # Carpeta utilizada como punto de montaje en Docker.
+│
+├── DER.png / DER.puml          # Diagrama Entidad-Relación y archivo fuente PlantUML.
+│
+├── docker-compose.yml          # Definición y orquestación de todos los servicios.
+│
+├── queries/                    # **Contenedor principal de scripts y consultas (Organizadas).**
+│   ├── Auxiliares(no ejecutar directamente)/ 
+│   │   ├── consulta_tickets_cliente.js # Script JS de MongoDB, usado por la lógica Python.
+│   │   └── mongo_query_top5.js         # Script JS de MongoDB, usado para el cálculo del Top 5.
+│   │
+│   ├── bebidas_precio_mas5.sql         # Consulta SQL de ejemplo.
+│   ├── pedidos_cliente_septiembre.py   # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB).
+│   ├── Practica Examen/                # Directorio para agrupar consultas de escenarios de evaluación.
+│   ├── promociones_activas_hoy.sql     # Consulta SQL de ejemplo.
+│   ├── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
+│   │   ├── prueba_cassandra.cql
+│   │   ├── prueba_mongodb.js
+│   │   ├── prueba_mysql.sql
+│   │   └── prueba_neo4j.cypher
+│   │
+│   ├── ranking_clientes_stars.sql      # Consulta SQL: Ranking de clientes por puntos de lealtad.
+│   └── top_5_prods.py                  # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
+│
+├── README.md                   # Documentación principal del proyecto.
+│
+└── setup/                      # Lógica para la inicialización y carga de datos de las DBs.
+    ├── 01_mysql_init.sql
+    ├── 02_mongodb_init.js
+    ├── 03_cassandra_init.cql
+    ├── 04_neo4j_init.cypher
+    ├── 05_redis_config.conf
+    ├── Dockerfile
+    ├── init_all_dbs.sh
+    └── wait-for-it.sh
 ```
 
 ## ⚙️ Configuración y Ejecución
