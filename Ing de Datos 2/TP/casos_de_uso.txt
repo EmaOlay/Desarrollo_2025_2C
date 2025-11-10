@@ -1,17 +1,19 @@
-Top 5 productos más vendidos en un pais especifico. 
+Top 5 productos más vendidos en un pais especifico.
 Done
-Clientes con más Stars acumulados. 
+Clientes con más Stars acumulados.
 Done
-Productos tipo “bebida” con precio mayor a 5 USD. 
+Productos tipo “bebida” con precio mayor a 5 USD.
 Done
 Órdenes de un cliente en septiembre. 
-Done
+Agregar validacion contra MySQL.(No tiene MySQL aun.)
 Órdenes por (fecha, sucursal). 
 
-Canjes por (cliente, fecha). 
+Canjes por (cliente, fecha).
 
-Caché de menú del día (TTL 1h). 
+Caché de menú del día (TTL 1h).
 
-Clientes que compraron ≥3 tipos de producto distintos. 
+Clientes que compraron ≥3 tipos de producto distintos.
 
-Productos más conectados (comprados por mayor número de clientes). 
+Productos más conectados (comprados por mayor número de clientes).
+
+Agregar thread de 

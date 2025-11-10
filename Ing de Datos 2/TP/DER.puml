@@ -12,9 +12,11 @@ entity Cliente <<(C,#ADD8E6) MySQL>> {
   nombre : string
   email : string <<UNIQUE>>
   telefono : string
+  pais : string
   saldo : double
   metodo_pago_preferido : string
   stars_acumuladas : int
+  estado_membresia : string
 }
 
 entity Sucursal <<(S,#ADD8E6) MySQL>> {
@@ -32,6 +34,7 @@ entity Promocion <<(P,#ADD8E6) MySQL>> {
   --
   nombre : string
   descuento : double
+  pais: string
   fechaInicio : date
   fechaFin : date
 }
@@ -65,7 +68,6 @@ entity Ticket <<(T,#90EE90) MongoDB>> {
   cliente_id : int <<FK_MySQL>> (Solo para lineage)
   cliente_nombre : string <<Embedded>>
   sucursal_id : int <<FK_MySQL>> (Solo para lineage)
-  sucursal_ciudad : string <<Embedded>>
   fecha : date
   total : double
   metodo_pago : string

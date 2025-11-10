@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS Cliente (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    pais VARCHAR(50),
     telefono VARCHAR(20),
     domicilio VARCHAR(255),
     saldo DECIMAL(10, 2) DEFAULT 0.00,

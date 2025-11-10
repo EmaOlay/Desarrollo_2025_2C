@@ -75,6 +75,7 @@ def get_top5_productos(sucursal_ids):
     # Usamos subprocess.run con input para enviar el script al stdin de mongosh
     mongo_output = run_command(command, input_data=mongo_script_with_vars)
 
+    # print(mongo_output)
     # 2e. Limpiar y parsear la salida JSON (Lógica corregida para ruido de mongosh)
     productos_agrupados = []
     

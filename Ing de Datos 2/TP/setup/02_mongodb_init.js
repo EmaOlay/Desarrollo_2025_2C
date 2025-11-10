@@ -1,33 +1,100 @@
-// setup/02_mongodb_init.js
-// Script de inicialización para MongoDB (Base de datos: starbucks_transactions)
+/**
+ * Script de Inicialización e Indexación para MongoDB
+ * Bases de Datos Políglotas (Capa Transaccional)
+ *
+ * Ejecutar en la mongo-shell (o mongosh)
+ * > mongosh --file mongo_init_script.js
+ */
 
-// use starbucks_transactions; // No se usa se pasa como argumento del string connection
+// Usar la base de datos (creará una si no existe)
+use("starbucks_transactions");
 
-// -----------------------------------------------------------
-// 1. ELIMINAR COLECCIONES PREVIAS (Idempotencia)
-// -----------------------------------------------------------
 print("Limpiando colecciones existentes...");
 db.ticket.drop();
 db.interaccion.drop();
 db.menudiacache.drop();
 db.canje.drop();
 
-// -----------------------------------------------------------
-// 2. Insertar datos de ejemplo y crear las colecciones
-// -----------------------------------------------------------
+print("--- 1. Creando Colecciones (si no existen) ---");
+
+// Aunque MongoDB crea colecciones implícitamente, podemos crearlas explícitamente si queremos opciones.
+db.createCollection("ticket");
+db.createCollection("interaccion");
+db.createCollection("canje");
+db.createCollection("MenuDiaCache");
+
+print("--- 2. Creando Índices ---");
+
+// =========================================================================================
+// COLECCIÓN: TICKET (Para transacciones y reportes rápidos)
+// =========================================================================================
+
+// Índice 1: Para búsquedas rápidas por sucursal y fecha (común para reportes)
+db.Ticket.createIndex({ sucursal_id: 1, fecha: -1 }, { name: "idx_sucursal_fecha" });
+
+// Índice 2: Para búsquedas por campos denormalizados críticos (ejemplo: buscar todos los tickets de un cliente para lineage)
+db.Ticket.createIndex({ cliente_id: 1 }, { name: "idx_cliente_id" });
+
+// Índice 3: Para acelerar consultas que filtran por la ciudad (campo denormalizado)
+db.Ticket.createIndex({ sucursal_ciudad: 1 }, { name: "idx_sucursal_ciudad" });
+
+// Índice 4: Índice Multi-clave para soportar búsquedas en el array 'detalles'
+// Esto optimiza búsquedas como la de "Latte Vainilla" que hicimos en el ejemplo.
+db.Ticket.createIndex({ "detalles.nombre_producto": 1 }, { name: "idx_detalles_producto" });
+
+
+// =========================================================================================
+// COLECCIÓN: INTERACCION (Para eventos y análisis de sentimiento/reseñas)
+// =========================================================================================
+
+// Índice 5: Para encontrar interacciones de un cliente en un período de tiempo
+db.Interaccion.createIndex({ cliente_id: 1, fecha: -1 }, { name: "idx_cliente_fecha_interaccion" });
+
+// Índice 6: Para reportes de baja calificación (filtrando en el subdocumento metadata)
+db.Interaccion.createIndex({ "metadata.score": 1 }, { name: "idx_metadata_score" });
+
+
+// =========================================================================================
+// COLECCIÓN: CANJE (Para análisis del programa de lealtad)
+// =========================================================================================
+
+// Índice 7: Búsquedas por cliente y fecha de canje
+db.Canje.createIndex({ cliente_id: 1, fecha_canje: -1 }, { name: "idx_cliente_fecha_canje" });
+
+// Índice 8: Búsquedas por el ítem canjeado
+db.Canje.createIndex({ item_canjeado: 1 }, { name: "idx_item_canjeado" });
+
+
+// =========================================================================================
+// COLECCIÓN: MENUDIACACHE (Cache con TTL)
+// =========================================================================================
+
+// Índice 9: Índice TTL (Time-To-Live)
+// Hace que los documentos en esta colección expiren automáticamente 1 hora (3600 segundos)
+// después de la 'fecha_creacion', tal como lo definiste en el DER.
+db.MenuDiaCache.createIndex(
+  { fecha_creacion: 1 },
+  { expireAfterSeconds: 3600, name: "idx_ttl_1hr" }
+);
+
+// Índice 10: Para desestructurar y buscar eficientemente productos por su tipo
+db.MenuDiaCache.createIndex({ "productos.tipo": 1 }, { name: "idx_productos_tipo" });
+
+
+print("--- 3. Inicialización de datos de prueba (Opcional) ---");
 
 // A. Colección 'ticket' (Transacciones)
 db.ticket.insertMany([
     {
         ticket_id: 1,
-        sucursal_id: 1,
+        sucursal_id: 2,
         cliente_id: 1,
         fecha: ISODate("2024-09-01T08:30:00Z"), // Ordenes por (fecha, sucursal)
         total: 6,
         metodo_pago: 'Efectivo',
         promocion_id: 1,
         detalles: [
-            { product_id: 501, cantidad: 2, precio: 3 } // Latte Grande
+            { product_id: 1, cantidad: 2, precio: 3 } // Latte Grande
         ]
     },
     {
@@ -39,21 +106,21 @@ db.ticket.insertMany([
         metodo_pago: 'Tarjeta',
         promocion_id: 2,
         detalles: [
-            { product_id: 502, cantidad: 1, precio: 7 } // Muffin
+            { product_id: 2, cantidad: 1, precio: 7 } // Muffin
         ]
     },
     {
         ticket_id: 3,
-        sucursal_id: 102,
+        sucursal_id: 3,
         cliente_id: 1,
         fecha: ISODate("2025-09-01T09:00:00Z"), // Misma fecha, diferente hora
         total: 32,
         metodo_pago: 'Efectivo',
         promocion_id: 1,
         detalles: [
-            { product_id: 501, cantidad: 2, precio: 16 }, // Latte Grande
-            { product_id: 502, cantidad: 1, precio: 5 },  // Muffin
-            { product_id: 503, cantidad: 1, precio: 5 }   // Capuccino Chico
+            { product_id: 1, cantidad: 2, precio: 16 }, // Latte Grande
+            { product_id: 2, cantidad: 1, precio: 5 },  // Muffin
+            { product_id: 3, cantidad: 1, precio: 5 }   // Capuccino Chico
         ] // Cliente 1 compra 3 productos distintos (para práctica de agregación)
     },
     {
@@ -65,94 +132,57 @@ db.ticket.insertMany([
         metodo_pago: 'Efectivo',
         promocion_id: 1,
         detalles: [
-            { product_id: 503, cantidad: 2, precio: 16 } // Capuccino Chico
+            { product_id: 3, cantidad: 2, precio: 16 } // Capuccino Chico
         ]
     },
 ]);
 
+db.Ticket.insertOne({
+  ticket_id: "TKT-2025-001",
+  cliente_id: 101,
+  cliente_nombre: "Ana García",
+  sucursal_id: 3,
+  sucursal_ciudad: "Buenos Aires",
+  fecha: new Date("2025-11-05T10:30:00Z"),
+  total: 6.50,
+  metodo_pago: "Tarjeta",
+  promocion_id: 201,
+  nombre_promocion: "Desc. Mañana",
+  detalles: [
+    { producto_id: 1, nombre_producto: "Latte Vainilla", precio_historico: 4.50, cantidad: 1 },
+    { producto_id: 3, nombre_producto: "Medialuna Jamón", precio_historico: 2.00, cantidad: 1 }
+  ]
+});
 
-// D. COLECCIÓN NUEVA: 'interaccion' (Eventos de Comportamiento)
-db.interaccion.insertMany([
-    {
-        cliente_id: 2,
-        tipo_evento: "ProductView",
-        fecha: ISODate("2025-11-05T08:00:00Z"),
-        metadata: { product_id: 503, source: "App Móvil" }
-    },
-    {
-        cliente_id: 1,
-        tipo_evento: "Review",
-        fecha: ISODate("2025-11-05T15:30:00Z"),
-        metadata: { product_id: 501, score: 5, comentario: "El mejor latte que he probado." }
-    },
-    {
-        cliente_id: 2,
-        tipo_evento: "Search",
-        fecha: ISODate("2025-11-06T09:10:00Z"),
-        metadata: { busqueda: "Muffin de Arándanos", resultados: 1 }
-    }
-]);
-print("Colección interaccion inicializada.");
+db.Interaccion.insertOne({
+  cliente_id: 102,
+  cliente_email: "juan.perez@email.com",
+  tipo_evento: "Reseña Producto",
+  fecha: new Date(),
+  metadata: {
+    producto_id: 1,
+    nombre_producto: "Latte Vainilla",
+    score: 1,
+    comentario: "Sabor muy aguado. Decepcionado." // Comentario corto (menos de 10 palabras)
+  }
+});
 
+db.Canje.insertOne({
+  cliente_id: 103,
+  cliente_stars_antes: 1200,
+  fecha_canje: new Date(),
+  stars_usadas: 800,
+  item_canjeado: "Taza Premium",
+  valor_estimado: 15.00
+});
 
-// E. COLECCIÓN NUEVA: 'menudiacache' (Caché con TTL)
-db.menudiacache.insertMany([
-    {
-        sucursal_id: 101,
-        fecha_creacion: ISODate("2025-11-06T19:00:00Z"), // Creado hace poco
-        nombre_menu: "Menú Espresso Express",
-        productos_ids: [501, 502],
-        precio_promocional: 6.99
-    },
-    {
-        sucursal_id: 102,
-        fecha_creacion: ISODate("2025-11-05T09:30:00Z"), // Creado ayer, ideal para TTL
-        nombre_menu: "Menú Desayuno Completo",
-        productos_ids: [502, 503],
-        precio_promocional: 9.50
-    }
-]);
-print("Colección menudiacache inicializada con datos de caché.");
+db.MenuDiaCache.insertOne({
+  sucursal_id: 1,
+  fecha_creacion: new Date(),
+  productos: [
+    { producto_id: 1, nombre: "Latte Vainilla", precio_actual: 4.80, tipo: "Bebida Caliente" },
+    { producto_id: 5, nombre: "Muffin de Chocolate", precio_actual: 3.50, tipo: "Pasteleria" }
+  ]
+});
 
-
-// F. COLECCIÓN NUEVA: 'canje' (Recompensas - Canjes por cliente, fecha)
-db.canje.insertMany([
-    {
-        cliente_id: 2,
-        fecha_canje: ISODate("2025-10-15T11:00:00Z"), // Canjes por (cliente, fecha)
-        stars_usadas: 100,
-        item_canjeado: "Bebida Gratis de cualquier tamaño"
-    },
-    {
-        cliente_id: 1,
-        fecha_canje: ISODate("2025-11-01T12:00:00Z"),
-        stars_usadas: 50,
-        item_canjeado: "Snack a mitad de precio"
-    }
-]);
-print("Colección canje inicializada.");
-
-
-// -----------------------------------------------------------
-// 3. Crear índices
-// -----------------------------------------------------------
-
-// Índices del Usuario
-db.ticket.createIndex({ ticket_id: 1 }, { unique: true });
-db.stores.createIndex({ store_id: 1 }, { unique: true });
-db.products.createIndex({ product_id: 1 }, { unique: true });
-
-// Índices para Requerimientos
-db.ticket.createIndex({ cliente_id: 1 });
-db.ticket.createIndex({ sucursal_id: 1, fecha: -1 }); // Órdenes por (fecha, sucursal)
-
-db.canje.createIndex({ cliente_id: 1, fecha_canje: -1 }); // Canjes por (cliente, fecha)
-
-// Índice TTL para Caché de Menú del Día (Elimina documentos 1 hora después de la creación)
-db.menudiacache.createIndex({ fecha_creacion: 1 }, { expireAfterSeconds: 3600 }); // 
-db.menudiacache.createIndex({ sucursal_id: 1 });
-
-db.interaccion.createIndex({ cliente_id: 1, fecha: -1 }); // Para analítica de comportamiento
-
-print("Índices creados exitosamente, incluyendo el índice TTL.");
-// Fin de la inicialización
+print("--- Inicialización y indexación completada. ---");

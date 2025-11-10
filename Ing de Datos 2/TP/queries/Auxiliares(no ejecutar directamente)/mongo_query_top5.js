@@ -15,7 +15,7 @@ db.ticket.aggregate([
     // 3. Agrupar por idProducto y sumar la cantidad vendida
     {
         $group: {
-            _id: "$detalles.producto_id",
+            _id: "$detalles.product_id",
             totalVendido: { $sum: "$detalles.cantidad" }
         }
     },

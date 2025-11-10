@@ -1,7 +1,8 @@
 #!/bin/bash
+clear
 set -e # Exit immediately if a command exits with a non-zero status
 
-echo "--- Starting Database Setup Service ---"
+echo "------------ Starting Database Setup Service ----------------"
 
 # ----------------------------------------
 # 1. Wait for all Core Services to be Healthy
@@ -70,4 +71,4 @@ echo "Neo4j setup finished"
 # Redis Configuration (Optional: Apply configuration via CLI if needed, otherwise skip)
 echo "Redis configuration applied via Docker Compose command (or skipped)."
 
-echo "--- All database setups are complete! ---"
+echo "----------- All database setups are complete! ----------------"
