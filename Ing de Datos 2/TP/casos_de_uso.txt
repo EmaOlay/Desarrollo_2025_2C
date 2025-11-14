@@ -1,11 +1,11 @@
 Top 5 productos más vendidos en un pais especifico.
-Done
+Done (MongoDB)
 Clientes con más Stars acumulados.
-Done
+Done (MySQL)
 Productos tipo “bebida” con precio mayor a 5 USD.
-Done
+Done (MySQL)
 Órdenes de un cliente en septiembre. 
-Agregar validacion contra MySQL.(No tiene MySQL aun.)
+Done (MongoDB)
 Órdenes por (fecha, sucursal). 
 
 Canjes por (cliente, fecha).

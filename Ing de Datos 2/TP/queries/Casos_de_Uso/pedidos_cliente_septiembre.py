@@ -2,10 +2,17 @@ import subprocess
 import sys
 import json
 import re
+import os # Import os # Import tempfile
 
 # --- CONFIGURACIÓN ---
 MONGO_QUERY_FILE = "/app/queries/Auxiliares(no ejecutar directamente)/consulta_tickets_cliente.js"
 MONGO_CONN = "mongosh mongodb://mongodb:27017/starbucks_transactions -u rootuser -p rootpassword --authenticationDatabase admin --quiet"
+
+# Configuración de MySQL
+MYSQL_HOST = "mysql"
+MYSQL_USER = "root"
+MYSQL_PASSWORD = "root_password"
+MYSQL_DATABASE = "my_data_warehouse"
 
 def run_command(command, input_data=None):
     """Ejecuta un comando de shell y devuelve la salida stdout o levanta un error."""
@@ -28,9 +35,57 @@ def run_command(command, input_data=None):
         print("ERROR: Comando no encontrado (mongosh).", file=sys.stderr)
         sys.exit(1)
 
+def validate_client_in_mysql(cliente_id):
+    """Valida si un cliente_id existe en la base de datos MySQL."""
+    print(f"\n--- Validando Cliente ID: {cliente_id} en MySQL ---")
+    
+    # Construir el comando MySQL para ejecutar la consulta directamente
+    command = (
+        f"mysql -h {MYSQL_HOST} -u {MYSQL_USER} -p{MYSQL_PASSWORD} "
+        f"{MYSQL_DATABASE} --batch --skip-ssl -e \"SELECT COUNT(*) FROM Cliente WHERE id = {cliente_id};\""
+    )
+    
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True,
+            shell=True
+        )
+        
+        # La salida de mysql --batch para SELECT COUNT(*) es el número directamente
+        # Asegurarse de que la salida no esté vacía y sea un número
+        # La salida puede incluir el nombre de la columna, por lo que necesitamos limpiarla
+        output_lines = result.stdout.strip().split('\n')
+        if len(output_lines) > 1 and output_lines[-1].isdigit(): # Expecting header + count
+            count = int(output_lines[-1])
+            if count > 0:
+                print(f"Cliente ID {cliente_id} encontrado en MySQL.")
+                return True
+            else:
+                print(f"Cliente ID {cliente_id} NO encontrado en MySQL.")
+                return False
+        else:
+            print(f"ERROR: Salida inesperada de MySQL: {result.stdout.strip()}", file=sys.stderr)
+            return False
+            
+    except subprocess.CalledProcessError as e:
+        print(f"\n--- ERROR DE EJECUCIÓN DE COMANDO MYSQL ---", file=sys.stderr)
+        print(f"Comando: {e.cmd}", file=sys.stderr)
+        print(f"Stderr: {e.stderr.strip()}", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError:
+        print("ERROR: Comando 'mysql' no encontrado.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"ERROR inesperado durante la validación MySQL: {e}", file=sys.stderr)
+        sys.exit(1)
+
 def get_tickets_by_client_id(cliente_id):
     """Ejecuta la consulta de MongoDB inyectando el clienteId."""
     print(f"\n--- Consultando Tickets para Cliente ID: {cliente_id} (Septiembre) ---")
+    
     
     # 1. Leer el script de consulta de MongoDB
     try:
@@ -87,8 +142,17 @@ def get_tickets_by_client_id(cliente_id):
 if __name__ == '__main__':
     # El script espera el clienteId como primer argumento de línea de comandos
     print("Ingrese un Cliente ID.")
-    cliente_id = input()
-    if cliente_id:
-        get_tickets_by_client_id(cliente_id)
+    cliente_id_input = input()
+    if cliente_id_input:
+        try:
+            cliente_id = int(cliente_id_input)
+            if validate_client_in_mysql(cliente_id):
+                get_tickets_by_client_id(cliente_id)
+            else:
+                print(f"Validación fallida para Cliente ID: {cliente_id}. No se consultará MongoDB.")
+        except ValueError:
+            print(f"ERROR: El Cliente ID debe ser un número entero. Recibido: {cliente_id_input}", file=sys.stderr)
+            sys.exit(1)
     else:
-        print(f"Esperoba recibir un cliente_id, recibi: {cliente_id}")
+        print(f"Esperaba recibir un cliente_id, recibí: {cliente_id_input}", file=sys.stderr)
+        sys.exit(1)
