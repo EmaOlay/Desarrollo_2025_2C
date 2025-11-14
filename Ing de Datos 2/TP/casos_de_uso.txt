@@ -6,7 +6,7 @@ Productos tipo “bebida” con precio mayor a 5 USD.
 Done (MySQL)
 Órdenes de un cliente en septiembre. 
 Done (MongoDB)
-Órdenes por (fecha, sucursal). 
+Órdenes por (fecha, sucursal).
 
 Canjes por (cliente, fecha).
 
@@ -16,4 +16,4 @@ Clientes que compraron ≥3 tipos de producto distintos.
 
 Productos más conectados (comprados por mayor número de clientes).
 
-Agregar thread de 
+Agregar thread de inserts.

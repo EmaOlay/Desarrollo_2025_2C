@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y \
 # Instalación de clientes de BD (cqlsh requiere pip)
 RUN pip install cqlsh
 
+RUN pip install pymongo
+
 # Instalación de la librería Rich (para TUI básico y formatting)
 RUN pip install rich
 

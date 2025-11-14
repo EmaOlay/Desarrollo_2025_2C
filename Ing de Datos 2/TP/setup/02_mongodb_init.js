@@ -135,6 +135,19 @@ db.ticket.insertMany([
             { product_id: 3, cantidad: 2, precio: 16 } // Capuccino Chico
         ]
     },
+        {
+        ticket_id: 57,
+        sucursal_id: 3,
+        cliente_id: 1,
+        fecha: ISODate("2025-09-01T15:00:00Z"),
+        total: 15,
+        metodo_pago: 'Efectivo',
+        promocion_id: 1,
+        detalles: [
+            { product_id: 3, cantidad: 2, precio: 16 },
+            { product_id: 2, cantidad: 1, precio: 1} // Capuccino Chico
+        ]
+    },
 ]);
 
 db.Ticket.insertOne({

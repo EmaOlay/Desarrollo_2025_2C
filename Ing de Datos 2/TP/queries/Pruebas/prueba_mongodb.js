@@ -26,3 +26,5 @@ try {
     print(`\n--- Conteo de Documentos ---`);
     print("Nota: No se pudo contar documentos. Asegúrate de que la colección 'ticket' exista.");
 }
+
+print(db.ticket.find({}))

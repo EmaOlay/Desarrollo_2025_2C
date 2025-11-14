@@ -9,6 +9,9 @@ WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
 USE starbucks_analytics;
 
+DROP TABLE IF EXISTS HistorialCompra;
+
+
 -- ----------------------------------------------------
 -- 2. TABLE CREATION (HistorialCompra)
 -- Partition Key (idCliente) ensures data for one customer is on one node.
@@ -16,12 +19,10 @@ USE starbucks_analytics;
 -- This design is ideal for fetching "all purchases made by client X".
 -- ----------------------------------------------------
 CREATE TABLE IF NOT EXISTS HistorialCompra (
-    idCliente int,
+    idSucursal int,
     fecha timestamp,
-    idTicket text, -- Reference to the MongoDB _id
-    total decimal,
-    productosComprados list<text>, -- List of product names or IDs
-    PRIMARY KEY (idCliente, fecha)
+    ticket_num int,
+    PRIMARY KEY (idSucursal, fecha)
 ) WITH CLUSTERING ORDER BY (fecha DESC);
 
 
@@ -29,11 +30,14 @@ CREATE TABLE IF NOT EXISTS HistorialCompra (
 -- 3. INITIAL DATA INSERT
 -- Example historical record
 -- ----------------------------------------------------
-INSERT INTO HistorialCompra (idCliente, fecha, idTicket, total, productosComprados)
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num)
 VALUES (
-    1, 
-    toTimestamp(now()), 
-    '650a310c9d78e348f936b9c7', -- Dummy MongoDB ID
-    7.50, 
-    ['Latte', 'Muffin']
+    2, -- sucursal_id from MongoDB ticket_id: 1
+    '2024-09-01 08:30:00+0000', -- fecha from MongoDB ticket_id: 1
+    1 -- ticket_id from MongoDB ticket_id: 1
 );
+
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (2, '2024-09-01 08:30:00+0000', 1);
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (102, '2025-09-01 08:30:00+0000', 2);
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (3, '2025-09-01 09:00:00+0000', 3);
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (101, '2025-09-02 15:00:00+0000', 4);
