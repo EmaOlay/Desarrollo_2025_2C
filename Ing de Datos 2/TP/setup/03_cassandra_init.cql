@@ -41,3 +41,4 @@ INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (2, '2024-09-
 INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (102, '2025-09-01 08:30:00+0000', 2);
 INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (3, '2025-09-01 09:00:00+0000', 3);
 INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (101, '2025-09-02 15:00:00+0000', 4);
+INSERT INTO HistorialCompra (idSucursal, fecha, ticket_num) VALUES (3, '2025-09-01 15:00:00+0000', 57);
