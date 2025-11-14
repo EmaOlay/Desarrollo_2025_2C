@@ -2,9 +2,63 @@ import os
 import sys
 from rich.console import Console
 from rich.table import Table
+from neo4j import GraphDatabase # Importar la librería de Neo4j
 
 console = Console()
 QUERIES_DIR = "/app/queries"
+
+# --- CONFIGURACIÓN NEO4J ---
+NEO4J_URI = "bolt://neo4j:7687"
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "neo4jpassword"
+
+def execute_neo4j_query(file_path):
+    """Ejecuta una o varias consultas Cypher desde un archivo usando la librería neo4j-driver."""
+    try:
+        with open(file_path, 'r') as f:
+            full_query_content = f.read()
+
+        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+        
+        with driver.session() as session:
+            console.print(f"[bold blue]Ejecutando consultas Cypher desde {file_path}...[/bold blue]")
+            
+            # Dividir el contenido en consultas individuales por el punto y coma
+            # Filtrar líneas vacías y comentarios
+            queries = [
+                stmt.strip() for stmt in full_query_content.split(';') 
+                if stmt.strip() and not stmt.strip().startswith('//') and not stmt.strip().startswith('--')
+            ]
+
+            if not queries:
+                console.print("[bold yellow]El archivo Cypher no contiene consultas válidas.[/bold yellow]")
+                driver.close()
+                return
+
+            for i, query in enumerate(queries):
+                console.print(f"\n[bold magenta]--- Ejecutando Consulta {i+1} ---[/bold magenta]")
+                console.print(f"[dim]{query}[/dim]") # Mostrar la consulta que se va a ejecutar
+                
+                result = session.run(query)
+                
+                # Imprimir resultados de forma estructurada
+                if result.peek(): # Check if there are any records
+                    table = Table(title=f"Resultados de Neo4j (Consulta {i+1})", show_lines=True)
+                    # Add columns based on the keys of the first record
+                    for key in result.keys():
+                        table.add_column(key, style="cyan")
+                    
+                    for record in result:
+                        table.add_row(*[str(record[key]) for key in result.keys()])
+                    console.print(table)
+                else:
+                    console.print("[bold yellow]Consulta ejecutada, no se retornaron resultados.[/bold yellow]")
+        
+        driver.close()
+    except FileNotFoundError:
+        console.print(f"[bold red]Error:[/bold red] Archivo Cypher no encontrado: {file_path}")
+    except Exception as e:
+        console.print(f"[bold red]Error al ejecutar consulta Neo4j:[/bold red] {e}")
 
 # Mapeo de extensión a comando de ejecución y alias de DB
 EXECUTOR_MAP = {
@@ -22,7 +76,7 @@ EXECUTOR_MAP = {
         "db": "Cassandra"
     },
     ".cypher": {
-        "cmd": "QUERY=$(cat {file}); printf '{\"statements\": [{ \"statement\": \"%s\" }]}' \"$QUERY\" | curl -s -X POST -H 'Content-Type: application/json' -u neo4j:neo4jpassword 'http://neo4j:7474/db/neo4j/tx/commit' -d @-",
+        "handler": execute_neo4j_query, # Usar la función Python
         "db": "Neo4j"
     },
     ".py": {"cmd": "python3 {file}", "db": "Python Lógica Políglota"},
@@ -134,13 +188,16 @@ def run_tui():
                     
                     if executor:
                         full_path = os.path.join(current_path, selected_script)
-                        command = executor["cmd"].format(file=full_path)
                         
                         console.print(f"\n[bold blue]>>> Ejecutando {selected_script} en {executor['db']}...[/bold blue]")
-                        print(command)
                         
-                        # Ejecutar el comando en el shell del contenedor
-                        os.system(command) 
+                        if executor.get("handler"):
+                            executor["handler"](full_path)
+                        else:
+                            command = executor["cmd"].format(file=full_path)
+                            print(command) # Print command only if it's a shell command
+                            # Ejecutar el comando en el shell del contenedor
+                            os.system(command) 
                         
                         console.input("\n[bold yellow]Presione ENTER para continuar...[/bold yellow]")
                     else:

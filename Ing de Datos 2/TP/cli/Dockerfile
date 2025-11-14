@@ -26,6 +26,8 @@ RUN pip install cqlsh
 
 RUN pip install pymongo
 
+RUN pip install neo4j
+
 RUN pip install mysql-connector-python
 
 # Instalación de la librería Rich (para TUI básico y formatting)

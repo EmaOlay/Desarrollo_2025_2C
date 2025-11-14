@@ -9,7 +9,7 @@ Done (MongoDB)
 Órdenes por (fecha, sucursal).
 Done (Cassandra)
 Canjes por (cliente, fecha).
-
+Done (MongoDB)
 Caché de menú del día (TTL 1h).
 
 Clientes que compraron ≥3 tipos de producto distintos.
