@@ -7,7 +7,7 @@ Done (MySQL)
 Órdenes de un cliente en septiembre. 
 Done (MongoDB)
 Órdenes por (fecha, sucursal).
-
+Done (Cassandra)
 Canjes por (cliente, fecha).
 
 Caché de menú del día (TTL 1h).

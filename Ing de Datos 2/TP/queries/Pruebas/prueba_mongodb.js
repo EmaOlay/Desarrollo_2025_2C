@@ -28,3 +28,6 @@ try {
 }
 
 print(db.ticket.find({}))
+
+print("CANJES")
+print(db.Canje.find({}))

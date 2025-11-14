@@ -59,10 +59,10 @@ db.Interaccion.createIndex({ "metadata.score": 1 }, { name: "idx_metadata_score"
 // =========================================================================================
 
 // Índice 7: Búsquedas por cliente y fecha de canje
-db.Canje.createIndex({ cliente_id: 1, fecha_canje: -1 }, { name: "idx_cliente_fecha_canje" });
+db.canje.createIndex({ cliente_id: 1, fecha_canje: -1 }, { name: "idx_cliente_fecha_canje" });
 
 // Índice 8: Búsquedas por el ítem canjeado
-db.Canje.createIndex({ item_canjeado: 1 }, { name: "idx_item_canjeado" });
+db.canje.createIndex({ item_canjeado: 1 }, { name: "idx_item_canjeado" });
 
 
 // =========================================================================================
@@ -180,8 +180,8 @@ db.Interaccion.insertOne({
   }
 });
 
-db.Canje.insertOne({
-  cliente_id: 103,
+db.canje.insertOne({
+  cliente_id: 2,
   cliente_stars_antes: 1200,
   fecha_canje: new Date(),
   stars_usadas: 800,
