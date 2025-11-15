@@ -15,8 +15,8 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 | :--- | :--- | :--- |
 | **`mysql`** | MySQL/MariaDB | **Maestro/Relacional:** Gestión de catálogos (`Producto`, `Sucursal`, `Cliente`) y datos de fidelización. |
 | **`mongodb`** | MongoDB | **Transaccional/Documental:** Almacenamiento de órdenes de compra y transacciones históricas detalladas. |
-| **`cassandra`** | Apache Cassandra | **Analítica/Series de Tiempo:** Registro de eventos de canje de puntos y logs de sistema. |
-| **`neo4j`** | Neo4j | **Grafos:** Análisis de relaciones complejas (ej. "Clientes que compraron productos recomendados por otros clientes"). |
+| **`cassandra`** | Apache Cassandra | **Analítica/Series de Tiempo:** Registro de historial de compras (`HistorialCompra`) y logs de sistema. |
+| **`neo4j`** | Neo4j | **Grafos:** Análisis de relaciones complejas (ej. "Productos más conectados" o "Clientes que compraron productos recomendados por otros clientes"). |
 | **`redis`** | Redis | **Cache:** Almacenamiento volátil para la sesión del usuario o *cache* de menús. |
 | **`cli`** | Python (Rich) | **Interfaz TUI:** Herramienta para ejecutar y demostrar las *queries* de negocio en cada BD. |
 | **`setup_service`** | Bash/Python/Shells de BD | **Inicialización:** Script que espera por la disponibilidad de todas las BD e inyecta los datos iniciales y la estructura. |
@@ -42,18 +42,21 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 │   │   ├── consulta_tickets_cliente.js # Script JS de MongoDB, usado por la lógica Python.
 │   │   └── mongo_query_top5.js         # Script JS de MongoDB, usado para el cálculo del Top 5.
 │   │
-│   ├── bebidas_precio_mas5.sql         # Consulta SQL de ejemplo.
-│   ├── pedidos_cliente_septiembre.py   # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB).
-│   ├── Practica Examen/                # Directorio para agrupar consultas de escenarios de evaluación.
-│   ├── promociones_activas_hoy.sql     # Consulta SQL de ejemplo.
+│   ├── Casos_de_Uso/                   # Directorio para scripts de casos de uso específicos.
+│   │   ├── ordenes_fecha_sucursal.py   # Script Políglota: Consulta órdenes de compra en Cassandra y las matchea con tickets en MongoDB.
+│   │   ├── canje_cliente_fecha.py      # Script Políglota: Consulta canjes de un cliente en MongoDB y busca sus detalles en MySQL.
+│   │   ├── bebidas_precio_mas5.sql     # Consulta SQL de ejemplo.
+│   │   ├── pedidos_cliente_septiembre.py # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB), validando cliente en MySQL.
+│   │   ├── promociones_activas_hoy.sql # Consulta SQL de ejemplo.
+│   │   ├── ranking_clientes_stars.sql  # Consulta SQL: Ranking de clientes por puntos de lealtad.
+│   │   └── top_5_prods.py              # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
+│   │
+│   ├── Practica_Examen/                # Directorio para agrupar consultas de escenarios de evaluación.
 │   ├── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
 │   │   ├── prueba_cassandra.cql
 │   │   ├── prueba_mongodb.js
 │   │   ├── prueba_mysql.sql
 │   │   └── prueba_neo4j.cypher
-│   │
-│   ├── ranking_clientes_stars.sql      # Consulta SQL: Ranking de clientes por puntos de lealtad.
-│   └── top_5_prods.py                  # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
 │
 ├── README.md                   # Documentación principal del proyecto.
 │
