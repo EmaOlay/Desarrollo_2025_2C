@@ -49,7 +49,10 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 │   │   ├── pedidos_cliente_septiembre.py # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB), validando cliente en MySQL.
 │   │   ├── promociones_activas_hoy.sql # Consulta SQL de ejemplo.
 │   │   ├── ranking_clientes_stars.sql  # Consulta SQL: Ranking de clientes por puntos de lealtad.
-│   │   └── top_5_prods.py              # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
+│   │   ├── top_5_prods.py              # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
+│   │   ├── productos_mas_conectados.cypher # Consulta Neo4j: Productos comprados por más clientes.
+│   │   ├── clientes_por_tipo_producto.cypher # Consulta Neo4j: Clientes que compraron >=3 tipos de productos.
+│   │   └── menu_del_dia_cache.py       # Script Python: Demuestra el uso de Redis para cache de menú del día.
 │   │
 │   ├── Practica_Examen/                # Directorio para agrupar consultas de escenarios de evaluación.
 │   ├── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
@@ -101,7 +104,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
     docker compose exec cli python cli_v2.py
     ```
 
-    *Dentro de la TUI, selecciona el ID del script que deseas ejecutar y presiona Enter.*
+    *Dentro de la TUI, puedes navegar por los directorios para encontrar el script que deseas ejecutar. Simplemente escribe el ID del script o directorio para seleccionarlo.*
 
 4.  **Detener y Limpiar:**
     Para detener todos los servicios y eliminar los contenedores y volúmenes (si usaste `-v` en `down`), usa:
@@ -121,6 +124,6 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **MySQL** | `mysql` | `root` | `root_password` | `my_data_warehouse` | `3306` |
 | **MongoDB** | `mongodb` | `rootuser` | `rootpassword` | `starbucks_transactions` | `27017` |
-| **Cassandra** | `cassandra` | (N/A) | (N/A) | `keyspace_starbucks` | `9042` |
-| **Neo4j** | `neo4j` | `neo4j` | `neo4jpass` | `neo4j` | `7687` |
+| **Cassandra** | `cassandra` | (N/A) | (N/A) | `starbucks_analytics` | `9042` |
+| **Neo4j** | `neo4j` | `neo4j` | `neo4jpassword` | `neo4j` | `7687` |
 | **Redis** | `redis` | (N/A) | (N/A) | (N/A) | `6379` |
