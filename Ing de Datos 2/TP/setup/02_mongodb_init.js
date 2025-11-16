@@ -167,13 +167,31 @@ db.ticket.insertOne({
   ]
 });
 
-db.canje.insertOne({
+db.canje.insertMany([
+    {
   cliente_id: 2,
   cliente_stars_antes: 1200,
   fecha_canje: new Date(),
   stars_usadas: 800,
   item_canjeado: "Taza Premium",
   valor_estimado: 15.00
-});
+},
+{
+  sucursal_id: 3,
+  sucursal_ciudad: "Buenos Aires",
+  cliente_id: 1,
+  cliente_stars_antes: 500,
+  fecha_canje: new Date(),
+  stars_usadas: 200,
+  item_canjeado: ["Cafe del dia","Extra shot de cafe"],
+  valor_estimado: 5.00
+},
+{
+  cliente_id: 2,
+  fecha_canje: new Date(),
+  item_canjeado: "Cafe de Cumpleaños",
+  valor_estimado: 2.00
+}
+]);
 
 print("--- Inicialización y indexación completada. ---");
