@@ -1,11 +1,11 @@
 Top 5 productos más vendidos en un pais especifico.
-Done (MongoDB)
+Done (Input pais-> MySQL (output id_sucursal) -> MongoDB (output ticket))
 Clientes con más Stars acumulados.
 Done (MySQL)
 Productos tipo “bebida” con precio mayor a 5 USD.
 Done (MySQL)
 Órdenes de un cliente en septiembre. 
-Done (MongoDB)
+Done (Input cliente_id -> MongoDB)
 Órdenes por (fecha, sucursal).
 Done (Cassandra)
 Canjes por (cliente, fecha).
@@ -18,5 +18,5 @@ Productos más conectados (comprados por mayor número de clientes).
 Done (Neo4j)
 
 -- Features --
-Agregar thread de inserts.
+Agregar thread de inserts.(TODO)
 Authentication (Redis)

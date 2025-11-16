@@ -14,9 +14,6 @@ DROP TABLE IF EXISTS HistorialCompra;
 
 -- ----------------------------------------------------
 -- 2. TABLE CREATION (HistorialCompra)
--- Partition Key (idCliente) ensures data for one customer is on one node.
--- Clustering Key (fecha) ensures data is ordered chronologically.
--- This design is ideal for fetching "all purchases made by client X".
 -- ----------------------------------------------------
 CREATE TABLE IF NOT EXISTS HistorialCompra (
     idSucursal int,
