@@ -13,7 +13,7 @@ Done (MongoDB)
 Caché de menú del día (TTL 1h).
 
 Clientes que compraron ≥3 tipos de producto distintos.
-
+Done(Neo4j)
 Productos más conectados (comprados por mayor número de clientes).
-
+Done(Neo4j)
 Agregar thread de inserts.

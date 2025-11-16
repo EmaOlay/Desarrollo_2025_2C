@@ -86,10 +86,12 @@ descripcion VARCHAR(255) COMMENT 'Descripción opcional del tipo.'
 -- 3. INITIAL INSERTS (Seed Data)
 -- ----------------------------------------------------
 -- Inserta sucursales. Si una sucursal ya existe (ej. por clave primaria), la ignora.
-INSERT IGNORE INTO Sucursal (pais, ciudad, direccion, horario, capacidad) VALUES
-('USA', 'New York', '123 Main St', '7am-9pm', 50),
-('Argentina', 'Buenos Aires', 'Av. Corrientes 456', '8am-8pm', 40),
-('Argentina', 'Buenos Aires', 'Av. Del Libertador 69', '8am-8pm', 20);
+INSERT IGNORE INTO Sucursal (id, pais, ciudad, direccion, horario, capacidad) VALUES
+(1, 'USA', 'New York', '123 Main St', '7am-9pm', 50),
+(2, 'Argentina', 'Buenos Aires', 'Av. Corrientes 456', '8am-8pm', 40),
+(3, 'Argentina', 'Buenos Aires', 'Av. Del Libertador 69', '8am-8pm', 20),
+(101, 'Argentina', 'Cordoba', 'Av. Velez Sarsfield 123', '8am-8pm', 30),
+(102, 'Argentina', 'Rosario', 'Bv. Oroño 456', '8am-8pm', 35);
 
 -- Inserta productos. Si un producto ya existe (ej. por nombre único), lo ignora.
 INSERT IGNORE INTO Producto (nombre, tipo, precio) VALUES
@@ -98,9 +100,12 @@ INSERT IGNORE INTO Producto (nombre, tipo, precio) VALUES
 ('Frappuccino', 'Bebida Fria', 5.50);
 
 -- Inserta un cliente. Si el cliente ya existe (ej. por email único), lo ignora.
-INSERT IGNORE INTO Cliente (nombre, email, telefono, domicilio, saldo, stars_acumuladas, fechaRegistro, estadoMembresia) VALUES
-('Alice Johnson', 'alice@example.com', '555-1234', '10 Elm St', 15.00, 5, CURDATE(), 'Activo'),
-('Jhon Doe', 'john.doe@example.com', '555-1234-5678', '10 Elm St', 150.00, 0, '2000-01-01', 'Inactivo');
+INSERT IGNORE INTO Cliente (id, nombre, email, telefono, domicilio, saldo, stars_acumuladas, fechaRegistro, estadoMembresia) VALUES
+(1, 'Alice Johnson', 'alice@example.com', '555-1234', '10 Elm St', 15.00, 5, CURDATE(), 'Activo'),
+(2, 'Jhon Doe', 'john.doe@example.com', '555-1234-5678', '10 Elm St', 150.00, 0, '2000-01-01', 'Inactivo'),
+(101, 'Ana Garcia', 'ana.garcia@example.com', '555-8765', '20 Oak St', 75.00, 10, CURDATE(), 'Activo'),
+(102, 'Juan Perez', 'juan.perez@email.com', '555-4321', '30 Pine St', 25.00, 2, CURDATE(), 'Activo'),
+(103, 'Carlos Sanchez', 'carlos.sanchez@example.com', '555-9999', '40 Maple St', 50.00, 8, CURDATE(), 'Activo');
 
 -- Inserta una promoción. Si la promoción ya existe, la ignora.
 INSERT IGNORE INTO Promocion (nombre, tipo, descuento, pais, fechaInicio, fechaFin) VALUES

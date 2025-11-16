@@ -4,70 +4,65 @@
 MATCH (n) DETACH DELETE n;
 
 // 2. Crear Nodos de Clientes
-UNWIND range(1, 10) AS i
-CREATE (c:Cliente {id: i, nombre: 'Cliente ' + i, email: 'cliente' + i + '@example.com'});
+CREATE (c1:Cliente {id: 1, nombre: 'Alice Johnson', email: 'alice@example.com'});
+CREATE (c2:Cliente {id: 2, nombre: 'Jhon Doe', email: 'john.doe@example.com'});
+CREATE (c3:Cliente {id: 101, nombre: 'Ana García', email: 'ana.garcia@example.com'});
+CREATE (c4:Cliente {id: 102, nombre: 'Juan Perez', email: 'juan.perez@email.com'});
+CREATE (c5:Cliente {id: 103, nombre: 'Carlos Sanchez', email: 'carlos.sanchez@example.com'});
 
 // 3. Crear Nodos de Productos
-UNWIND range(1, 10) AS i
-CREATE (p:Producto {id: i, nombre: 'Producto ' + i, precio: toFloat(rand() * 100 + 10)});
+CREATE (p1:Producto {id: 1, nombre: 'Latte', precio: 4.50, tipo: 'Bebida Caliente'});
+CREATE (p2:Producto {id: 2, nombre: 'Muffin', precio: 3.00, tipo: 'Panadería/Pasteleria'});
+CREATE (p3:Producto {id: 3, nombre: 'Frappuccino', precio: 5.50, tipo: 'Bebida Fria'});
 
 // 4. Crear Nodos de Sucursales
-CREATE (s1:Sucursal {id: 1, nombre: 'Sucursal Centro', ciudad: 'Buenos Aires'});
-CREATE (s2:Sucursal {id: 2, nombre: 'Sucursal Norte', ciudad: 'Buenos Aires'});
-CREATE (s3:Sucursal {id: 3, nombre: 'Sucursal Sur', ciudad: 'Córdoba'});
+CREATE (s1:Sucursal {id: 1, nombre: 'Sucursal New York', ciudad: 'New York'});
+CREATE (s2:Sucursal {id: 2, nombre: 'Sucursal Buenos Aires Centro', ciudad: 'Buenos Aires'});
+CREATE (s3:Sucursal {id: 3, nombre: 'Sucursal Buenos Aires Libertador', ciudad: 'Buenos Aires'});
+CREATE (s4:Sucursal {id: 101, nombre: 'Sucursal Cordoba', ciudad: 'Cordoba'});
+CREATE (s5:Sucursal {id: 102, nombre: 'Sucursal Rosario', ciudad: 'Rosario'});
 
-// 5. Crear Relaciones de Compra (Cliente)-[:COMPRA]->(Producto)
-// Aseguramos que algunos productos sean comprados por más clientes
-// y que cada compra esté asociada a una sucursal.
 
-// Cliente 1 compra varios productos
-MATCH (c:Cliente {id: 1}), (p1:Producto {id: 1}), (p2:Producto {id: 2}), (p3:Producto {id: 3}), (s:Sucursal {id: 1})
-CREATE (c)-[:COMPRA {cantidad: 2, fecha: datetime('2023-01-15T10:00:00')}]->(p1),
-       (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-01-15T10:00:00')}]->(p2),
-       (c)-[:COMPRA {cantidad: 3, fecha: datetime('2023-02-20T11:30:00')}]->(p3);
+// 5. Crear Relaciones de Compra (Cliente)-[:COMPRA]->(Producto) y (Compra)-[:EN]->(Sucursal)
 
-// Cliente 2 compra algunos productos, incluyendo uno ya comprado por Cliente 1
-MATCH (c:Cliente {id: 2}), (p1:Producto {id: 1}), (p4:Producto {id: 4}), (s:Sucursal {id: 2})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-01-20T14:00:00')}]->(p1),
-       (c)-[:COMPRA {cantidad: 2, fecha: datetime('2023-03-01T09:00:00')}]->(p4);
+// Ticket 1
+MATCH (c:Cliente {id: 1}), (p:Producto {id: 1}), (s:Sucursal {id: 2})
+CREATE (c)-[:COMPRA {ticket_id: 1, cantidad: 2, fecha: datetime('2024-09-01T08:30:00Z')}]->(p);
 
-// Cliente 3 compra algunos productos, incluyendo uno ya comprado por Cliente 1 y 2
-MATCH (c:Cliente {id: 3}), (p1:Producto {id: 1}), (p5:Producto {id: 5}), (s:Sucursal {id: 1})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-02-01T16:00:00')}]->(p1),
-       (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-04-10T12:00:00')}]->(p5);
+// Ticket 2
+MATCH (c:Cliente {id: 2}), (p:Producto {id: 2}), (s:Sucursal {id: 102})
+CREATE (c)-[:COMPRA {ticket_id: 2, cantidad: 1, fecha: datetime('2025-09-01T08:30:00Z')}]->(p);
 
-// Cliente 4 compra un producto
-MATCH (c:Cliente {id: 4}), (p6:Producto {id: 6}), (s:Sucursal {id: 3})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-03-10T13:00:00')}]->(p6);
+// Ticket 3
+MATCH (c:Cliente {id: 1}), (p1:Producto {id: 1}), (p2:Producto {id: 2}), (p3:Producto {id: 3}), (s:Sucursal {id: 3})
+CREATE (c)-[:COMPRA {ticket_id: 3, cantidad: 2, fecha: datetime('2025-09-01T09:00:00Z')}]->(p1),
+       (c)-[:COMPRA {ticket_id: 3, cantidad: 1, fecha: datetime('2025-09-01T09:00:00Z')}]->(p2),
+       (c)-[:COMPRA {ticket_id: 3, cantidad: 1, fecha: datetime('2025-09-01T09:00:00Z')}]->(p3);
 
-// Cliente 5 compra un producto
-MATCH (c:Cliente {id: 5}), (p7:Producto {id: 7}), (s:Sucursal {id: 2})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-04-05T17:00:00')}]->(p7);
+// Ticket 4
+MATCH (c:Cliente {id: 2}), (p:Producto {id: 3}), (s:Sucursal {id: 101})
+CREATE (c)-[:COMPRA {ticket_id: 4, cantidad: 2, fecha: datetime('2025-09-02T15:00:00Z')}]->(p);
 
-// Clientes restantes compran productos variados, algunos compartidos
-MATCH (c:Cliente {id: 6}), (p:Producto {id: 2}), (s:Sucursal {id: 1})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-05-01T10:00:00')}]->(p);
+// Ticket 57
+MATCH (c:Cliente {id: 1}), (p1:Producto {id: 3}), (p2:Producto {id: 2}), (s:Sucursal {id: 3})
+CREATE (c)-[:COMPRA {ticket_id: 57, cantidad: 2, fecha: datetime('2025-09-01T15:00:00Z')}]->(p1),
+       (c)-[:COMPRA {ticket_id: 57, cantidad: 1, fecha: datetime('2025-09-01T15:00:00Z')}]->(p2);
 
-MATCH (c:Cliente {id: 7}), (p:Producto {id: 3}), (s:Sucursal {id: 3})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-06-15T11:00:00')}]->(p);
+// Nuevas compras para hacer el grafo más interesante
+MATCH (c103:Cliente {id: 103}), (p1:Producto {id: 1})
+CREATE (c103)-[:COMPRA {ticket_id: 1001, cantidad: 1, fecha: datetime('2025-10-10T10:00:00Z')}]->(p1);
 
-MATCH (c:Cliente {id: 8}), (p:Producto {id: 8}), (s:Sucursal {id: 1})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-07-20T14:00:00')}]->(p);
+MATCH (c101:Cliente {id: 101}), (p2:Producto {id: 2})
+CREATE (c101)-[:COMPRA {ticket_id: 1002, cantidad: 1, fecha: datetime('2025-10-11T11:00:00Z')}]->(p2);
 
-MATCH (c:Cliente {id: 9}), (p:Producto {id: 9}), (s:Sucursal {id: 2})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-08-01T15:00:00')}]->(p);
+MATCH (c102:Cliente {id: 102}), (p3:Producto {id: 3})
+CREATE (c102)-[:COMPRA {ticket_id: 1003, cantidad: 1, fecha: datetime('2025-10-12T12:00:00Z')}]->(p3);
 
-MATCH (c:Cliente {id: 10}), (p:Producto {id: 10}), (s:Sucursal {id: 3})
-CREATE (c)-[:COMPRA {cantidad: 1, fecha: datetime('2023-09-10T16:00:00')}]->(p);
+MATCH (c1:Cliente {id: 1}), (p3:Producto {id: 3})
+CREATE (c1)-[:COMPRA {ticket_id: 1004, cantidad: 1, fecha: datetime('2025-10-13T13:00:00Z')}]->(p3);
 
-// Relacionar las compras con las sucursales
-// Esto se hace implícitamente en los CREATEs anteriores, pero si las relaciones
-// COMPRA ya existieran, se podría hacer así:
-// MATCH (c:Cliente)-[compra:COMPRA]->(p:Producto), (s:Sucursal)
-// WHERE compra.fecha >= datetime('2023-01-01') AND compra.fecha <= datetime('2023-12-31')
-// AND s.id = CASE
-//     WHEN p.id IN [1,2,3,6,8] THEN 1 // Productos comprados en Sucursal 1
-//     WHEN p.id IN [1,4,7,9] THEN 2 // Productos comprados en Sucursal 2
-//     ELSE 3 // Productos comprados en Sucursal 3
-// END
-// CREATE (compra)-[:REALIZADA_EN]->(s);
+MATCH (c2:Cliente {id: 2}), (p1:Producto {id: 1})
+CREATE (c2)-[:COMPRA {ticket_id: 1005, cantidad: 1, fecha: datetime('2025-10-14T14:00:00Z')}]->(p1);
+
+MATCH (c101:Cliente {id: 101}), (p1:Producto {id: 1})
+CREATE (c101)-[:COMPRA {ticket_id: 1006, cantidad: 1, fecha: datetime('2025-10-15T15:00:00Z')}]->(p1);

@@ -153,7 +153,7 @@ db.ticket.insertMany([
 db.Ticket.insertOne({
   ticket_id: "TKT-2025-001",
   cliente_id: 101,
-  cliente_nombre: "Ana García",
+  cliente_nombre: "Ana Garcia",
   sucursal_id: 3,
   sucursal_ciudad: "Buenos Aires",
   fecha: new Date("2025-11-05T10:30:00Z"),
@@ -162,8 +162,8 @@ db.Ticket.insertOne({
   promocion_id: 201,
   nombre_promocion: "Desc. Mañana",
   detalles: [
-    { producto_id: 1, nombre_producto: "Latte Vainilla", precio_historico: 4.50, cantidad: 1 },
-    { producto_id: 3, nombre_producto: "Medialuna Jamón", precio_historico: 2.00, cantidad: 1 }
+    { producto_id: 1, nombre_producto: "Latte", precio_historico: 4.50, cantidad: 1 },
+    { producto_id: 2, nombre_producto: "Muffin", precio_historico: 2.00, cantidad: 1 }
   ]
 });
 
@@ -174,7 +174,7 @@ db.Interaccion.insertOne({
   fecha: new Date(),
   metadata: {
     producto_id: 1,
-    nombre_producto: "Latte Vainilla",
+    nombre_producto: "Latte",
     score: 1,
     comentario: "Sabor muy aguado. Decepcionado." // Comentario corto (menos de 10 palabras)
   }
@@ -193,8 +193,9 @@ db.MenuDiaCache.insertOne({
   sucursal_id: 1,
   fecha_creacion: new Date(),
   productos: [
-    { producto_id: 1, nombre: "Latte Vainilla", precio_actual: 4.80, tipo: "Bebida Caliente" },
-    { producto_id: 5, nombre: "Muffin de Chocolate", precio_actual: 3.50, tipo: "Pasteleria" }
+    { producto_id: 1, nombre: "Latte", precio_actual: 4.80, tipo: "Bebida Caliente" },
+    { producto_id: 2, nombre: "Muffin", precio_actual: 3.50, tipo: "Panadería/Pasteleria" },
+    { producto_id: 3, nombre: "Frappuccino", precio_actual: 5.50, tipo: "Bebida Fria" }
   ]
 });
 
