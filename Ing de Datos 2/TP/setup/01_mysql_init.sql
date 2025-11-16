@@ -113,8 +113,10 @@ INSERT IGNORE INTO Promocion (nombre, tipo, descuento, pais, fechaInicio, fechaF
 
 -- Inserta stock. Si la combinación de idSucursal e idProducto ya existe, la ignora.
 INSERT IGNORE INTO Stock (idSucursal, idProducto, cantidad) VALUES
-(1, 1, 100), (1, 2, 50),
-(2, 1, 80), (2, 3, 60);
+(1, 1, 100),
+(1, 2, 50),
+(2, 1, 80),
+(2, 3, 60);
 
 INSERT INTO Tipo_Producto (idTipoProducto, descripcion) VALUES
 ('Bebida Caliente', 'Bebidas servidas calientes, como Lattes, Capuccinos, Té.'),
