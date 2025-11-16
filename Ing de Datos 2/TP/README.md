@@ -13,7 +13,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 
 | Servicio | Tecnología | Propósito |
 | :--- | :--- | :--- |
-| **`mysql`** | MySQL/MariaDB | **Maestro/Relacional:** Gestión de catálogos (`Producto`, `Sucursal`, `Cliente`) y datos de fidelización. |
+| **`mysql`** | MySQL | **Maestro/Relacional:** Gestión de catálogos (`Producto`, `Sucursal`, `Cliente`) y datos de fidelización. |
 | **`mongodb`** | MongoDB | **Transaccional/Documental:** Almacenamiento de órdenes de compra y transacciones históricas detalladas. |
 | **`cassandra`** | Apache Cassandra | **Analítica/Series de Tiempo:** Registro de historial de compras (`HistorialCompra`) y logs de sistema. |
 | **`neo4j`** | Neo4j | **Grafos:** Análisis de relaciones complejas (ej. "Productos más conectados" o "Clientes que compraron productos recomendados por otros clientes"). |

@@ -30,6 +30,8 @@ RUN pip install neo4j
 
 RUN pip install mysql-connector-python
 
+RUN pip install redis
+
 # Instalación de la librería Rich (para TUI básico y formatting)
 RUN pip install rich
 

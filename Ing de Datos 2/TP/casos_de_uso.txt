@@ -11,9 +11,12 @@ Done (Cassandra)
 Canjes por (cliente, fecha).
 Done (MongoDB)
 Caché de menú del día (TTL 1h).
-
+Done (Redis)
 Clientes que compraron ≥3 tipos de producto distintos.
-Done(Neo4j)
+Done (Neo4j)
 Productos más conectados (comprados por mayor número de clientes).
-Done(Neo4j)
+Done (Neo4j)
+
+-- Features --
 Agregar thread de inserts.
+Authentication (Redis)
