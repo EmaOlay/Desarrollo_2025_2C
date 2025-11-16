@@ -7,7 +7,7 @@ Este proyecto implementa una arquitectura de datos políglota para simular los s
 El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **Interfaz de Usuario de Texto (TUI)** para demostrar la funcionalidad de las consultas en cada motor de base de datos.
 
 ## DER de la applicacion:
-![Texto alternativo para la imagen](DER.png)
+![Modelo Entidad-Relación (DER)](DER Definitivo.png)
 
 ## 🚀 Arquitectura Políglota (Servicios)
 
@@ -20,6 +20,8 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 | **`redis`** | Redis | **Cache:** Almacenamiento volátil para la sesión del usuario o *cache* de menús. |
 | **`cli`** | Python (Rich) | **Interfaz TUI:** Herramienta para ejecutar y demostrar las *queries* de negocio en cada BD. |
 | **`setup_service`** | Bash/Python/Shells de BD | **Inicialización:** Script que espera por la disponibilidad de todas las BD e inyecta los datos iniciales y la estructura. |
+
+![Arquitectura Políglota](Arquitectura.png)
 
 ## 📦 Estructura del Proyecto
 

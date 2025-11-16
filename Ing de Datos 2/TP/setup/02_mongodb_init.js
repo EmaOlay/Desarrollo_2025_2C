@@ -150,7 +150,7 @@ db.ticket.insertMany([
     },
 ]);
 
-db.Ticket.insertOne({
+db.ticket.insertOne({
   ticket_id: "TKT-2025-001",
   cliente_id: 101,
   cliente_nombre: "Ana Garcia",
@@ -167,19 +167,6 @@ db.Ticket.insertOne({
   ]
 });
 
-db.Interaccion.insertOne({
-  cliente_id: 102,
-  cliente_email: "juan.perez@email.com",
-  tipo_evento: "Reseña Producto",
-  fecha: new Date(),
-  metadata: {
-    producto_id: 1,
-    nombre_producto: "Latte",
-    score: 1,
-    comentario: "Sabor muy aguado. Decepcionado." // Comentario corto (menos de 10 palabras)
-  }
-});
-
 db.canje.insertOne({
   cliente_id: 2,
   cliente_stars_antes: 1200,
@@ -187,16 +174,6 @@ db.canje.insertOne({
   stars_usadas: 800,
   item_canjeado: "Taza Premium",
   valor_estimado: 15.00
-});
-
-db.MenuDiaCache.insertOne({
-  sucursal_id: 1,
-  fecha_creacion: new Date(),
-  productos: [
-    { producto_id: 1, nombre: "Latte", precio_actual: 4.80, tipo: "Bebida Caliente" },
-    { producto_id: 2, nombre: "Muffin", precio_actual: 3.50, tipo: "Panadería/Pasteleria" },
-    { producto_id: 3, nombre: "Frappuccino", precio_actual: 5.50, tipo: "Bebida Fria" }
-  ]
 });
 
 print("--- Inicialización y indexación completada. ---");

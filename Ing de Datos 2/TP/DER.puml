@@ -1,142 +1,55 @@
 @startuml
+
 skinparam linetype ortho
-skinparam Entity {
-  BorderColor black
-  FontName Arial
+
+component "CLI"
+component "Setup Service"
+
+package "Bases de Datos" {
+
+  package "MySQL" {
+    rectangle Cliente
+    rectangle Sucursal
+    rectangle Promocion
+    rectangle Producto
+    rectangle Tipo_Producto
+    rectangle Stock
+  }
+
+  package "MongoDB" {
+    rectangle Ticket
+    rectangle Interaccion
+    rectangle Canje
+    rectangle MenuDiaCache
+  }
+
+  package "Redis" {
+    rectangle RedisCache
+  }
+
+  package "Cassandra" {
+    rectangle HistorialCompra
+  }
+
+  package "Neo4j" {
+    rectangle Neo4jCliente
+  }
 }
 
-' 1. Capa Relacional (MySQL - Datos Maestros/Referenciales)
-entity Cliente <<(C,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  nombre : string
-  email : string <<UNIQUE>>
-  telefono : string
-  pais : string
-  saldo : double
-  metodo_pago_preferido : string
-  stars_acumuladas : int
-  estado_membresia : string
-}
+' Relaciones
+CLI --> Cliente
+CLI --> Ticket
+CLI --> HistorialCompra
+CLI --> Neo4jCliente
+CLI --> RedisCache
 
-entity Sucursal <<(S,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  pais : string
-  ciudad : string
-  direccion : string
-  horario : string
-  capacidad : int
-}
+Setup --> Cliente
+Setup --> Ticket
+Setup --> HistorialCompra
+Setup --> Neo4jCliente
+Setup --> RedisCache
 
-entity Promocion <<(P,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  nombre : string
-  descuento : double
-  pais: string
-  fechaInicio : date
-  fechaFin : date
-}
-
-entity Producto <<(R,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  nombre : string
-  precio : double
-  tipo_id: int <<FK>>
-}
-
-entity Tipo_Producto <<(R,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  nombre : string
-}
-
-entity Stock <<(S,#ADD8E6) MySQL>> {
-  id : int <<PK>>
-  --
-  idSucursal : int <<FK>>
-  idProducto : int <<FK>>
-  cantidad : int
-}
-
-' 2. Capa Transaccional y Operacional DENORMALIZADA (MongoDB)
-entity Ticket <<(T,#90EE90) MongoDB>> {
-  ticket_id : string <<PK>>
-  --
-  cliente_id : int <<FK_MySQL>> (Solo para lineage)
-  cliente_nombre : string <<Embedded>>
-  sucursal_id : int <<FK_MySQL>> (Solo para lineage)
-  fecha : date
-  total : double
-  metodo_pago : string
-  promocion_id : int <<FK_MySQL>> (opcional)
-  nombre_promocion : string <<Embedded>>
-  detalles_json : JSON <<Embedded>> ' representacion simplificada
-}
-
-entity Interaccion <<(I,#90EE90) MongoDB>> {
-  _id : ObjectId <<PK>>
-  --
-  cliente_id : int <<FK_MySQL>> (Solo para lineage)
-  cliente_email : string <<Embedded>>
-  tipo_evento : string
-  fecha : ISODate
-  metadata_json : JSON <<Embedded>> ' representacion simplificada
-}
-
-entity Canje <<(E,#90EE90) MongoDB>> {
-  _id : ObjectId <<PK>>
-  --
-  cliente_id : int <<FK_MySQL>> (Solo para lineage)
-  cliente_stars_antes : int <<Embedded>>
-  fecha_canje : ISODate
-  stars_usadas : int
-  item_canjeado : string
-  valor_estimado : double <<Embedded>>
-}
-
-entity MenuDiaCache <<(M,#90EE90) MongoDB>> {
-  _id : ObjectId <<PK>>
-  --
-  sucursal_id : int <<FK_MySQL>> (Solo para refresco)
-  fecha_creacion : ISODate <<TTL 1 Hora>>
-  productos_json : JSON <<Embedded>> ' representacion simplificada
-}
-
-' 3. Entidades Analíticas (Cassandra & Neo4j)
-entity HistorialCompra <<(H,#FFDAB9) Cassandra>> {
-  idCliente : int <<PK, Partition Key>>
-  --
-  fecha : datetime <<PK, Clustering Key>>
-  idTicket : string
-  total : double
-}
-
-entity RedSocial <<(N,#FFC0CB) Neo4j>> {
-  id : int <<PK>>
-  --
-  nombre : string
-}
-
-' ------------------------------------------------------------------
-' 4. Relaciones
-' ------------------------------------------------------------------
-
-Tipo_Producto "1" -- "N" Producto : pertenece_a
-Sucursal "1" -- "N" Stock : posee
-Producto "1" -- "N" Stock : disponible_en
-
-Cliente "1" -- "N" Ticket : genera
-Sucursal "1" -- "N" Ticket : emite
-Promocion "0..1" -- "N" Ticket : aplicada_a
-
-Cliente "1" -- "N" Interaccion : registra_evento
-Cliente "1" -- "N" Canje : registra_lealtad
-Sucursal "1" -- "N" MenuDiaCache : publica_menu
-
-Cliente "1" -- "N" HistorialCompra : registra (Cassandra)
-Cliente "N" -- "N" RedSocial : SIGUE (Neo4j)
+Cliente "1" -- "N" Ticket
+Neo4jCliente "N" -- "N" Neo4jCliente : SIGUE
 
 @enduml
