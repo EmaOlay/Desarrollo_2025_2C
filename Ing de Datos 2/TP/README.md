@@ -26,45 +26,42 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 ## 📦 Estructura del Proyecto
 
 ```
-├── TP/
-│
+.
+├── Arquitectura.png            # Diagrama de la arquitectura políglota.
 ├── casos_de_uso.txt            # Documento que detalla los requisitos y casos de uso.
-│
 ├── cli/                        # Entorno y código de la Interfaz TUI (Terminal User Interface).
-│   ├── cli_v2.py               # Lógica principal de la TUI, ahora con **navegación por directorios**.
+│   ├── cli_v2.py               # Lógica principal de la TUI, con navegación por directorios.
 │   ├── Dockerfile              # Define la imagen para el servicio CLI.
-│   └── queries/                # Carpeta utilizada como punto de montaje en Docker.
-│
-├── DER.png / DER.puml          # Diagrama Entidad-Relación y archivo fuente PlantUML.
-│
-├── docker-compose.yml          # Definición y orquestación de todos los servicios.
-│
-├── queries/                    # **Contenedor principal de scripts y consultas (Organizadas).**
+│   └── queries/                # Carpeta vacía utilizada como punto de montaje en Docker.
+├── DER_Definitivo.png          # Diagrama Entidad-Relación (DER) definitivo.
+├── DER.puml                    # Archivo fuente PlantUML para el DER.
+├── docker-compose.yml          # Definición y orquestación de todos los servicios con Docker Compose.
+├── queries/                    # Contenedor principal de scripts y consultas, organizadas por caso de uso y tecnología.
 │   ├── Auxiliares(no ejecutar directamente)/ 
 │   │   ├── consulta_tickets_cliente.js # Script JS de MongoDB, usado por la lógica Python.
 │   │   └── mongo_query_top5.js         # Script JS de MongoDB, usado para el cálculo del Top 5.
-│   │
 │   ├── Casos_de_Uso/                   # Directorio para scripts de casos de uso específicos.
-│   │   ├── ordenes_fecha_sucursal.py   # Script Políglota: Consulta órdenes de compra en Cassandra y las matchea con tickets en MongoDB.
+│   │   ├── bebidas_precio_mas5.sql     # Consulta SQL para encontrar bebidas con precio mayor a 5.
 │   │   ├── canje_cliente_fecha.py      # Script Políglota: Consulta canjes de un cliente en MongoDB y busca sus detalles en MySQL.
-│   │   ├── bebidas_precio_mas5.sql     # Consulta SQL de ejemplo.
-│   │   ├── pedidos_cliente_septiembre.py # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB), validando cliente en MySQL.
-│   │   ├── promociones_activas_hoy.sql # Consulta SQL de ejemplo.
-│   │   ├── ranking_clientes_stars.sql  # Consulta SQL: Ranking de clientes por puntos de lealtad.
-│   │   ├── top_5_prods.py              # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
-│   │   ├── productos_mas_conectados.cypher # Consulta Neo4j: Productos comprados por más clientes.
 │   │   ├── clientes_por_tipo_producto.cypher # Consulta Neo4j: Clientes que compraron >=3 tipos de productos.
-│   │   └── menu_del_dia_cache.py       # Script Python: Demuestra el uso de Redis para cache de menú del día.
-│   │
+│   │   ├── menu_del_dia_cache.py       # Script Python: Demuestra el uso de Redis para cache de menú del día.
+│   │   ├── ordenes_fecha_sucursal.py   # Script Políglota: Consulta órdenes en Cassandra y las cruza con tickets en MongoDB.
+│   │   ├── pedidos_cliente_septiembre.py # Script Políglota: Consulta tickets de un cliente en Septiembre (MongoDB), validando cliente en MySQL.
+│   │   ├── productos_mas_conectados.cypher # Consulta Neo4j: Productos comprados por más clientes.
+│   │   ├── ranking_clientes_stars.sql  # Consulta SQL: Ranking de clientes por puntos de lealtad.
+│   │   └── top_5_prods.py              # Script Políglota: Coordina MySQL (Sucursales) y MongoDB (Ventas).
 │   ├── Practica_Examen/                # Directorio para agrupar consultas de escenarios de evaluación.
-│   ├── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
-│   │   ├── prueba_cassandra.cql
-│   │   ├── prueba_mongodb.js
-│   │   ├── prueba_mysql.sql
-│   │   └── prueba_neo4j.cypher
-│
+│   │   ├── AllSalesSucursal.js
+│   │   ├── AllTickets.js
+│   │   └── DropDocument.js
+│   └── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
+│       ├── promociones_activas_hoy.sql
+│       ├── prueba_cassandra.cql
+│       ├── prueba_mongodb.js
+│       ├── prueba_mysql.sql
+│       ├── prueba_neo4j.cypher
+│       └── prueba_redis.py
 ├── README.md                   # Documentación principal del proyecto.
-│
 └── setup/                      # Lógica para la inicialización y carga de datos de las DBs.
     ├── 01_mysql_init.sql
     ├── 02_mongodb_init.js
