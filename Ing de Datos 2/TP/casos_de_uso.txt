@@ -1,21 +1,47 @@
 Top 5 productos más vendidos en un pais especifico.
 Done (Input pais-> MySQL (output id_sucursal) -> MongoDB (output ticket))
+- Flujo: El usuario provee un país. El sistema consulta MySQL para obtener las sucursales de ese país y luego usa esas sucursales para buscar en MongoDB todos los tickets correspondientes. Finalmente, agrega los productos de esos tickets para calcular el top 5.
+- Justificación: Se usa MySQL para los datos maestros de sucursales (rígidos, consistentes) y MongoDB para los datos transaccionales de tickets, que son complejos y anidados, facilitando la agregación.
+
 Clientes con más Stars acumulados.
 Done (MySQL)
+- Flujo: El sistema consulta la tabla `Cliente` en MySQL y la ordena de forma descendente por el campo `stars_acumuladas` para obtener el ranking.
+- Justificación: Los datos de clientes son maestros y requieren la consistencia transaccional (ACID) de MySQL. Una consulta ordenada sobre una columna indexada es extremadamente eficiente.
+
 Productos tipo “bebida” con precio mayor a 5 USD.
 Done (MySQL)
+- Flujo: El sistema realiza un JOIN entre las tablas `Producto` y `Tipo_Producto` en MySQL para filtrar por tipo "bebida" y precio > 5.
+- Justificación: Es una consulta sobre datos de referencia estructurados. Las bases de datos relacionales como MySQL están optimizadas para este tipo de operaciones con JOINs.
+
 Órdenes de un cliente en septiembre. 
 Done (Input cliente_id -> MongoDB)
+- Flujo: El usuario provee un ID de cliente. El sistema consulta la colección `Ticket` en MongoDB para encontrar los documentos que coincidan con el ID del cliente y cuya fecha esté en septiembre.
+- Justificación: MongoDB es ideal para consultas sobre datos transaccionales semi-estructurados como los tickets, permitiendo filtros eficientes por campos específicos como `cliente_id` y rangos de fecha.
+
 Órdenes por (fecha, sucursal).
 Done (Cassandra)
+- Flujo: El usuario provee una sucursal y una fecha. El sistema consulta la tabla `HistorialCompra` en Cassandra, que está particionada por `idSucursal` y clusterizada por `fecha`.
+- Justificación: Cassandra está optimizado para escrituras masivas y lecturas rápidas en dimensiones específicas. Este modelo de datos (partición por tienda, cluster por fecha) es ideal para consultas de series temporales y analítica, ofreciendo un rendimiento superior para este caso de uso.
+
 Canjes por (cliente, fecha).
 Done (MongoDB)
+- Flujo: El usuario provee un cliente y un rango de fechas. El sistema consulta la colección `Canje` en MongoDB, filtrando por `cliente_id` y `fecha_canje`.
+- Justificación: Los eventos de canje son transacciones que se modelan bien como documentos individuales en MongoDB, permitiendo búsquedas flexibles sobre el historial de un cliente.
+
 Caché de menú del día (TTL 1h).
 Done (Redis)
+- Flujo: Una petición del menú de una tienda primero busca en Redis. Si encuentra la clave, devuelve el menú cacheado. Si no, consulta MySQL para construir el menú, lo guarda en Redis con un TTL de 1 hora y lo devuelve.
+- Justificación: Redis ofrece una caché en memoria de latencia ultra baja, ideal para datos de alta lectura y baja modificación como un menú. Esto reduce la carga sobre la base de datos principal (MySQL) y acelera la respuesta. El TTL maneja la invalidación automática.
+
 Clientes que compraron ≥3 tipos de producto distintos.
 Done (Neo4j)
+- Flujo: Se ejecuta una consulta en Neo4j que atraviesa el grafo desde los nodos `Cliente` hacia los `Producto` que compraron, cuenta los tipos de producto distintos para cada cliente y devuelve aquellos con 3 o más.
+- Justificación: Es un problema de grafos que implica analizar relaciones complejas. Neo4j es mucho más eficiente y expresivo para este tipo de consultas multi-salto que una base de datos relacional.
+
 Productos más conectados (comprados por mayor número de clientes).
 Done (Neo4j)
+- Flujo: Se ejecuta una consulta en Neo4j que, partiendo de los nodos `Producto`, cuenta las relaciones entrantes `COMPRO` desde nodos `Cliente` para determinar qué productos han sido comprados por más clientes únicos.
+- Justificación: Es una consulta de conectividad, un punto fuerte de las bases de datos de grafos. Contar el grado de relaciones de un nodo es una operación fundamental y muy rápida en Neo4j.
 
 -- Features --
 Agregar thread de inserts.(TODO)
