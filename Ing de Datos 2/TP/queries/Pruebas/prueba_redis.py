@@ -27,4 +27,31 @@ if menu_recuperado_json:
 else:
     print("El menú del día no se encontró en la caché o ha expirado.")
 
+# Consultar el usuario
+KEY_USER = "user:emaolay2"
+print(f"\nConsultando clave: {KEY_USER}...")
+usuario_recuperado = r.get(KEY_USER)
+
+if menu_recuperado_json:
+    # usuario = json.loads(menu_recuperado_json)
+    print(f"usuario_recuperado: {usuario_recuperado}")
+    print(f"TTL restante: {r.ttl(KEY_USER)} segundos")
+    print("Usuario recuperado")
+    print(usuario)
+    # print(f"TTL restante: {r.ttl("usuario:emaolay")} segundos")
+else:
+    print("El usuario no se encontró en la caché o ha expirado.")
+
+
+KEY_SESSION = "session:emaolay2"
+print(f"\nConsultando clave: {KEY_SESSION}...")
+session_recuperada = r.get(KEY_SESSION)
+
+if session_recuperada:
+    print(f"session_recuperada: {session_recuperada}")
+    print(f"TTL restante: {r.ttl(KEY_SESSION)} segundos")
+    print("Sesión recuperada")
+else:
+    print("La sesión no se encontró en la caché o ha expirado.")
+
 print("\nScript finalizado.")
