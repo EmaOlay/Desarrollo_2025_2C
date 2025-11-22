@@ -99,6 +99,23 @@ services:
       # Pasar credenciales si el script las necesita (aunque ya están hardcodeadas)
       - MYSQL_ROOT_PASSWORD=root_password
       - NEO4J_PASSWORD=neo4jpassword
+  seed_service:
+    build:
+      context: ./seed_service
+      dockerfile: Dockerfile
+    image: tp-seed-service:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASS=root_password
+      - MYSQL_DB=my_data_warehouse
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 # ----------------------------------------------
 # 4. La cli como servicio aparte
 # ----------------------------------------------
