@@ -12,7 +12,7 @@ printjson({
 // 2. Mostrar Colecciones (el equivalente a SHOW TABLES)
 print("\n--- Colecciones Disponibles ---");
 const collections = db.getCollectionNames();
-collections.forEach(function(name) {
+collections.forEach(function (name) {
     print(`| ${name} |`);
 });
 
@@ -28,6 +28,8 @@ try {
 }
 
 print(db.ticket.find({}))
+print(db.Ticket.find({}))
+
 
 print("CANJES")
 print(db.Canje.find({}))

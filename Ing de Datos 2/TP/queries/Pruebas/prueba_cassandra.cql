@@ -19,3 +19,6 @@ SELECT idSucursal, fecha, ticket_num
             WHERE idSucursal = 3
             AND fecha >= '2025-09-01 00:00:00+0000'
             AND fecha <= '2025-09-01 23:59:59+0000';
+
+    
+select * from historialcompra;

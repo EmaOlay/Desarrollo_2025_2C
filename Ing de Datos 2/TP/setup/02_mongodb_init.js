@@ -85,69 +85,69 @@ print("--- 3. Inicialización de datos de prueba (Opcional) ---");
 
 // A. Colección 'ticket' (Transacciones)
 db.ticket.insertMany([
-    {
-        ticket_id: 1,
-        sucursal_id: 2,
-        cliente_id: 1,
-        fecha: ISODate("2024-09-01T08:30:00Z"), // Ordenes por (fecha, sucursal)
-        total: 6,
-        metodo_pago: 'Efectivo',
-        promocion_id: 1,
-        detalles: [
-            { product_id: 1, cantidad: 2, precio: 3 } // Latte Grande
-        ]
-    },
-    {
-        ticket_id: 2,
-        sucursal_id: 102,
-        cliente_id: 2,
-        fecha: ISODate("2025-09-01T08:30:00Z"),
-        total: 7,
-        metodo_pago: 'Tarjeta',
-        promocion_id: 2,
-        detalles: [
-            { product_id: 2, cantidad: 1, precio: 7 } // Muffin
-        ]
-    },
-    {
-        ticket_id: 3,
-        sucursal_id: 3,
-        cliente_id: 1,
-        fecha: ISODate("2025-09-01T09:00:00Z"), // Misma fecha, diferente hora
-        total: 32,
-        metodo_pago: 'Efectivo',
-        promocion_id: 1,
-        detalles: [
-            { product_id: 1, cantidad: 2, precio: 16 }, // Latte Grande
-            { product_id: 2, cantidad: 1, precio: 5 },  // Muffin
-            { product_id: 3, cantidad: 1, precio: 5 }   // Capuccino Chico
-        ] // Cliente 1 compra 3 productos distintos (para práctica de agregación)
-    },
-    {
-        ticket_id: 4,
-        sucursal_id: 101,
-        cliente_id: 2,
-        fecha: ISODate("2025-09-02T15:00:00Z"),
-        total: 32,
-        metodo_pago: 'Efectivo',
-        promocion_id: 1,
-        detalles: [
-            { product_id: 3, cantidad: 2, precio: 16 } // Capuccino Chico
-        ]
-    },
-        {
-        ticket_id: 57,
-        sucursal_id: 3,
-        cliente_id: 1,
-        fecha: ISODate("2025-09-01T15:00:00Z"),
-        total: 15,
-        metodo_pago: 'Efectivo',
-        promocion_id: 1,
-        detalles: [
-            { product_id: 3, cantidad: 2, precio: 16 },
-            { product_id: 2, cantidad: 1, precio: 1} // Capuccino Chico
-        ]
-    },
+  {
+    ticket_id: 1,
+    sucursal_id: 2,
+    cliente_id: 1,
+    fecha: ISODate("2024-09-01T08:30:00Z"), // Ordenes por (fecha, sucursal)
+    total: 6,
+    metodo_pago: 'Efectivo',
+    promocion_id: 1,
+    detalles: [
+      { product_id: 1, cantidad: 2, precio: 3 } // Latte Grande
+    ]
+  },
+  {
+    ticket_id: 2,
+    sucursal_id: 102,
+    cliente_id: 2,
+    fecha: ISODate("2025-09-01T08:30:00Z"),
+    total: 7,
+    metodo_pago: 'Tarjeta',
+    promocion_id: 2,
+    detalles: [
+      { product_id: 2, cantidad: 1, precio: 7 } // Muffin
+    ]
+  },
+  {
+    ticket_id: 3,
+    sucursal_id: 3,
+    cliente_id: 1,
+    fecha: ISODate("2025-09-01T09:00:00Z"), // Misma fecha, diferente hora
+    total: 32,
+    metodo_pago: 'Efectivo',
+    promocion_id: 1,
+    detalles: [
+      { product_id: 1, cantidad: 2, precio: 16 }, // Latte Grande
+      { product_id: 2, cantidad: 1, precio: 5 },  // Muffin
+      { product_id: 3, cantidad: 1, precio: 5 }   // Capuccino Chico
+    ] // Cliente 1 compra 3 productos distintos (para práctica de agregación)
+  },
+  {
+    ticket_id: 4,
+    sucursal_id: 101,
+    cliente_id: 2,
+    fecha: ISODate("2025-09-02T15:00:00Z"),
+    total: 32,
+    metodo_pago: 'Efectivo',
+    promocion_id: 1,
+    detalles: [
+      { product_id: 3, cantidad: 2, precio: 16 } // Capuccino Chico
+    ]
+  },
+  {
+    ticket_id: 57,
+    sucursal_id: 3,
+    cliente_id: 1,
+    fecha: ISODate("2025-09-01T15:00:00Z"),
+    total: 15,
+    metodo_pago: 'Efectivo',
+    promocion_id: 1,
+    detalles: [
+      { product_id: 3, cantidad: 2, precio: 16 },
+      { product_id: 2, cantidad: 1, precio: 1 } // Capuccino Chico
+    ]
+  },
 ]);
 
 db.ticket.insertOne({

@@ -11,3 +11,6 @@ FROM Sucursal;
 
 SELECT *
 FROM Tipo_Producto;
+
+SELECT *
+FROM Cliente;
