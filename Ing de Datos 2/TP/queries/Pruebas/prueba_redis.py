@@ -1,57 +1,77 @@
 import redis
 import json
-import time
 
-# Conectar a Redis
-# Asume que Redis está corriendo en localhost:6379
-try:
-    r = redis.Redis(host='redis_cache', port=6379, db=0)
-    r.ping()
-    print("Conexión a Redis exitosa!")
-except redis.exceptions.ConnectionError as e:
-    print(f"No se pudo conectar a Redis: {e}")
-    print("Asegúrate de que el servidor Redis esté corriendo.")
-    exit()
+def test_redis_connection_and_data():
+    """
+    Se conecta a Redis, verifica la conexión y muestra todas las claves y sus valores.
+    """
+    try:
+        # Conexión al servidor de Redis
+        r = redis.Redis(host='redis_cache', port=6379, db=0, decode_responses=True)
+        r.ping()
+        print("--- Conexión a Redis exitosa ---\n")
+    except redis.exceptions.ConnectionError as e:
+        print(f"Error: No se pudo conectar a Redis en 'redis_cache:6379'.")
+        print(f"Detalle: {e}")
+        print("Asegúrate de que el contenedor de Redis esté corriendo y sea accesible.")
+        return
 
-KEY_MENU_DEL_DIA = "menu_del_dia"
+    # Obtener información del servidor
+    info = r.info()
+    print("--- Información del Servidor ---")
+    print(f"Versión de Redis: {info.get('redis_version')}")
+    print(f"Memoria Usada: {info.get('used_memory_human')}")
+    print(f"Número de Claves: {info.get('db0', {}).get('keys', 'N/A')}\n")
 
-# Consultar el menú del día
-print(f"\nConsultando el menú del día (clave: {KEY_MENU_DEL_DIA})...")
-menu_recuperado_json = r.get(KEY_MENU_DEL_DIA)
+    # Escanear y mostrar todas las claves
+    print("--- Contenido de la Base de Datos (Clave por Clave) ---")
+    keys = r.keys('*')
+    if not keys:
+        print("La base de datos de Redis está vacía.")
+    else:
+        for key in keys:
+            key_type = r.type(key)
+            ttl = r.ttl(key)
+            ttl_str = f"(TTL: {ttl}s)" if ttl != -1 else "(Sin expiración)"
 
-if menu_recuperado_json:
-    menu_recuperado = json.loads(menu_recuperado_json)
-    print("Menú del día recuperado:")
-    print(json.dumps(menu_recuperado, indent=2))
-    print(f"TTL restante: {r.ttl(KEY_MENU_DEL_DIA)} segundos")
-else:
-    print("El menú del día no se encontró en la caché o ha expirado.")
+            print(f"\n> Clave: '{key}' | Tipo: {key_type} {ttl_str}")
 
-# Consultar el usuario
-KEY_USER = "user:emaolay2"
-print(f"\nConsultando clave: {KEY_USER}...")
-usuario_recuperado = r.get(KEY_USER)
+            try:
+                if key_type == 'string':
+                    value = r.get(key)
+                    # Intentar decodificar como JSON para una mejor visualización
+                    try:
+                        parsed_json = json.loads(value)
+                        print("  Valor (JSON):")
+                        print(json.dumps(parsed_json, indent=2))
+                    except (json.JSONDecodeError, TypeError):
+                        print(f"  Valor: {value}")
+                
+                elif key_type == 'hash':
+                    value = r.hgetall(key)
+                    print("  Valor (Hash):")
+                    for field, val in value.items():
+                        print(f"    - {field}: {val}")
+                
+                elif key_type == 'list':
+                    value = r.lrange(key, 0, -1)
+                    print(f"  Valor (Lista, {len(value)} elementos): {value}")
 
-if menu_recuperado_json:
-    # usuario = json.loads(menu_recuperado_json)
-    print(f"usuario_recuperado: {usuario_recuperado}")
-    print(f"TTL restante: {r.ttl(KEY_USER)} segundos")
-    print("Usuario recuperado")
-    print(usuario)
-    # print(f"TTL restante: {r.ttl("usuario:emaolay")} segundos")
-else:
-    print("El usuario no se encontró en la caché o ha expirado.")
+                elif key_type == 'set':
+                    value = r.smembers(key)
+                    print(f"  Valor (Set, {len(value)} elementos): {value}")
 
+                elif key_type == 'zset':
+                    value = r.zrange(key, 0, -1, withscores=True)
+                    print(f"  Valor (Sorted Set, {len(value)} elementos): {value}")
 
-KEY_SESSION = "session:emaolay2"
-print(f"\nConsultando clave: {KEY_SESSION}...")
-session_recuperada = r.get(KEY_SESSION)
+                else:
+                    print(f"  (Tipo de dato '{key_type}' no manejado para visualización detallada)")
 
-if session_recuperada:
-    print(f"session_recuperada: {session_recuperada}")
-    print(f"TTL restante: {r.ttl(KEY_SESSION)} segundos")
-    print("Sesión recuperada")
-else:
-    print("La sesión no se encontró en la caché o ha expirado.")
+            except Exception as e:
+                print(f"  Error al obtener el valor de la clave '{key}': {e}")
 
-print("\nScript finalizado.")
+    print("\n--- Fin del script de prueba de Redis ---")
+
+if __name__ == "__main__":
+    test_redis_connection_and_data()

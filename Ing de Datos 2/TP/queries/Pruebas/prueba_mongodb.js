@@ -1,4 +1,4 @@
-// Script de prueba para verificar la conectividad y la base de datos 'starbucks_transactions'.
+// Script de prueba para verificar la conectividad y consultar todas las colecciones.
 
 // 1. Mostrar estado de conexión y versión
 print("--- Conexión y Estado ---");
@@ -16,20 +16,17 @@ collections.forEach(function (name) {
     print(`| ${name} |`);
 });
 
-// 3. Ejecutar una consulta de prueba simple (contar documentos en una colección existente, si tienes una)
-// ASUMIMOS que tienes una colección llamada 'ordenes' (o 'transactions') en tu DB de inicialización.
-try {
-    const count = db.ticket.countDocuments({});
-    print(`\n--- Conteo de Documentos ---`);
-    print(`La colección 'ticket' contiene ${count} documentos.`);
-} catch (e) {
-    print(`\n--- Conteo de Documentos ---`);
-    print("Nota: No se pudo contar documentos. Asegúrate de que la colección 'ticket' exista.");
-}
+// 3. Consultar cada una de las colecciones
+print("\n--- Contenido de la colección 'ticket' ---");
+printjson(db.ticket.find().toArray());
+print("\n--- Cantidad de documentos de la colección 'ticket' ---");
+printjson(db.ticket.find().count());
 
-print(db.ticket.find({}))
-print(db.Ticket.find({}))
+print("\n--- Contenido de la colección 'interaccion' ---");
+printjson(db.interaccion.find().toArray());
 
+print("\n--- Contenido de la colección 'canje' ---");
+printjson(db.canje.find().toArray());
 
-print("CANJES")
-print(db.Canje.find({}))
+print("\n--- Contenido de la colección 'MenuDiaCache' ---");
+printjson(db.MenuDiaCache.find().toArray());

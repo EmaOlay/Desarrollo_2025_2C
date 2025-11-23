@@ -103,20 +103,27 @@ def execute_neo4j_query(file_path):
     """Ejecuta una o varias consultas Cypher desde un archivo usando la librería neo4j-driver."""
     try:
         with open(file_path, 'r') as f:
-            full_query_content = f.read()
+            # Lee el contenido y filtra las líneas que son solo comentarios
+            lines = f.readlines()
+            
+        # Filtra las líneas que son completamente comentarios
+        non_comment_lines = [
+            line for line in lines 
+            if not line.strip().startswith('//') and not line.strip().startswith('--')
+        ]
+        
+        full_query_content = "".join(non_comment_lines)
 
         driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
         
         with driver.session() as session:
             console.print(f"[bold blue]Ejecutando consultas Cypher desde {file_path}...[/bold blue]")
             
-            queries = [
-                stmt.strip() for stmt in full_query_content.split(';') 
-                if stmt.strip() and not stmt.strip().startswith('//') and not stmt.strip().startswith('--')
-            ]
+            # Divide el contenido limpio en consultas basadas en el punto y coma
+            queries = [stmt.strip() for stmt in full_query_content.split(';') if stmt.strip()]
 
             if not queries:
-                console.print("[bold yellow]El archivo Cypher no contiene consultas válidas.[/bold yellow]")
+                console.print("[bold yellow]El archivo Cypher no contiene consultas válidas (después de filtrar comentarios).[/bold yellow]")
                 driver.close()
                 return
 

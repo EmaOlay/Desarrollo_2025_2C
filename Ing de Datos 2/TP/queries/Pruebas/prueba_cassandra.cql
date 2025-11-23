@@ -1,24 +1,21 @@
--- Script de prueba para verificar la conectividad a Cassandra y listar keyspaces.
+-- Script de prueba para verificar la conectividad a Cassandra y consultar datos.
 
--- 1. Mostrar estado de conexión (esto se hace implícitamente al conectar)
--- 2. Mostrar la versión del servidor
+-- 1. Mostrar la versión del servidor
 SELECT
     release_version AS Version,
     cluster_name AS Cluster
 FROM
     system.local;
 
--- 3. Mostrar Keyspaces (equivalente a SHOW DATABASES en SQL)
+-- 2. Mostrar Keyspaces (equivalente a SHOW DATABASES en SQL)
 DESCRIBE KEYSPACES;
 
+-- 3. Usar el keyspace de la aplicación
 USE starbucks_analytics;
 
---
-SELECT idSucursal, fecha, ticket_num
-            FROM HistorialCompra
-            WHERE idSucursal = 3
-            AND fecha >= '2025-09-01 00:00:00+0000'
-            AND fecha <= '2025-09-01 23:59:59+0000';
+-- 4. Describir la tabla para verificar el esquema
+DESCRIBE TABLE HistorialCompra;
 
-    
-select * from historialcompra;
+-- 5. Consultar todos los datos de la tabla
+SELECT 'Tabla HistorialCompra' AS '';
+SELECT * FROM HistorialCompra;
