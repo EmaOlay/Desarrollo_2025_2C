@@ -20,6 +20,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 | **`redis`** | Redis | **Cache:** Almacenamiento volátil para la sesión del usuario o *cache* de menús. |
 | **`cli`** | Python (Rich) | **Interfaz TUI:** Herramienta para ejecutar y demostrar las *queries* de negocio en cada BD. |
 | **`setup_service`** | Bash/Python/Shells de BD | **Inicialización:** Script que espera por la disponibilidad de todas las BD e inyecta los datos iniciales y la estructura. |
+| **`seed_service`**| Python (FastAPI) | **Generador de Datos:** Servicio que genera datos de prueba (órdenes, clientes, etc.) bajo demanda a través de una API. |
 
 ![Arquitectura Políglota](Arquitectura.png)
 
@@ -27,10 +28,12 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 
 ```
 .
+├── .gitignore                  # Archivo para ignorar archivos y directorios en Git.
 ├── Arquitectura.png            # Diagrama de la arquitectura políglota.
 ├── casos_de_uso.txt            # Documento que detalla los requisitos y casos de uso.
 ├── cli/                        # Entorno y código de la Interfaz TUI (Terminal User Interface).
 │   ├── cli_v2.py               # Lógica principal de la TUI, con navegación por directorios.
+│   ├── cli_v3.py               # Script alternativo que inicia la TUI y un generador de datos en segundo plano.
 │   ├── Dockerfile              # Define la imagen para el servicio CLI.
 │   └── queries/                # Carpeta vacía utilizada como punto de montaje en Docker.
 ├── DER_Definitivo.png          # Diagrama Entidad-Relación (DER) definitivo.
@@ -54,7 +57,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 │   │   ├── AllSalesSucursal.js
 │   │   ├── AllTickets.js
 │   │   └── DropDocument.js
-│   └── Pruebas/                        # Directorio para scripts de prueba básicos por DB.
+│   └── Pruebas/                        # Scripts para verificar la conexión y el estado de cada base de datos.
 │       ├── promociones_activas_hoy.sql
 │       ├── prueba_cassandra.cql
 │       ├── prueba_mongodb.js
@@ -62,6 +65,10 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 │       ├── prueba_neo4j.cypher
 │       └── prueba_redis.py
 ├── README.md                   # Documentación principal del proyecto.
+├── seed_service/               # Servicio para generar datos de prueba.
+│   ├── app.py                  # Lógica del servicio FastAPI.
+│   ├── Dockerfile              # Define la imagen para el servicio de seed.
+│   └── requirements.txt        # Dependencias de Python para el servicio.
 └── setup/                      # Lógica para la inicialización y carga de datos de las DBs.
     ├── 01_mysql_init.sql
     ├── 02_mongodb_init.js
@@ -99,9 +106,17 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 3.  **Iniciar la TUI (Interfaz de Consulta):**
     Una vez que las bases de datos estén inicializadas, puedes iniciar la interfaz para ejecutar las *queries*.
 
-    ```bash
-    docker compose exec cli python cli_v2.py
-    ```
+    *   **Opción A (Estándar):**
+        Inicia la TUI estándar para ejecutar consultas manualmente.
+        ```bash
+        docker compose exec cli python cli_v2.py
+        ```
+
+    *   **Opción B (Con Generador de Datos):**
+        Inicia la TUI y, en segundo plano, un generador automático de transacciones para simular un entorno dinámico.
+        ```bash
+        docker compose exec cli python cli_v3.py
+        ```
 
     *Dentro de la TUI, puedes navegar por los directorios para encontrar el script que deseas ejecutar. Simplemente escribe el ID del script o directorio para seleccionarlo.*
 
@@ -111,10 +126,10 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
     ```bash
     docker compose down -v
     ```
-5. **Conectar al servicio:**
-    Para conectarte con algun servicio en particular.
+5. **Conectar a un servicio:**
+    Para conectarte a la terminal de un servicio en particular (por ejemplo, `mysql`):
     ```bash
-    docker exec -it 84c107aef385 bash
+    docker compose exec mysql bash
     ```
 
 ## 🔑 Credenciales (Configuración por Defecto)
