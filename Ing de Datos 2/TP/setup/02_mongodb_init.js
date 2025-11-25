@@ -30,17 +30,17 @@ print("--- 2. Creando Índices ---");
 // =========================================================================================
 
 // Índice 1: Para búsquedas rápidas por sucursal y fecha (común para reportes)
-db.Ticket.createIndex({ sucursal_id: 1, fecha: -1 }, { name: "idx_sucursal_fecha" });
+db.ticket.createIndex({ sucursal_id: 1, fecha: -1 }, { name: "idx_sucursal_fecha" });
 
 // Índice 2: Para búsquedas por campos denormalizados críticos (ejemplo: buscar todos los tickets de un cliente para lineage)
-db.Ticket.createIndex({ cliente_id: 1 }, { name: "idx_cliente_id" });
+db.ticket.createIndex({ cliente_id: 1 }, { name: "idx_cliente_id" });
 
 // Índice 3: Para acelerar consultas que filtran por la ciudad (campo denormalizado)
-db.Ticket.createIndex({ sucursal_ciudad: 1 }, { name: "idx_sucursal_ciudad" });
+db.ticket.createIndex({ sucursal_ciudad: 1 }, { name: "idx_sucursal_ciudad" });
 
 // Índice 4: Índice Multi-clave para soportar búsquedas en el array 'detalles'
 // Esto optimiza búsquedas como la de "Latte Vainilla" que hicimos en el ejemplo.
-db.Ticket.createIndex({ "detalles.nombre_producto": 1 }, { name: "idx_detalles_producto" });
+db.ticket.createIndex({ "detalles.nombre_producto": 1 }, { name: "idx_detalles_producto" });
 
 
 // =========================================================================================
@@ -48,10 +48,10 @@ db.Ticket.createIndex({ "detalles.nombre_producto": 1 }, { name: "idx_detalles_p
 // =========================================================================================
 
 // Índice 5: Para encontrar interacciones de un cliente en un período de tiempo
-db.Interaccion.createIndex({ cliente_id: 1, fecha: -1 }, { name: "idx_cliente_fecha_interaccion" });
+db.interaccion.createIndex({ cliente_id: 1, fecha: -1 }, { name: "idx_cliente_fecha_interaccion" });
 
 // Índice 6: Para reportes de baja calificación (filtrando en el subdocumento metadata)
-db.Interaccion.createIndex({ "metadata.score": 1 }, { name: "idx_metadata_score" });
+db.interaccion.createIndex({ "metadata.score": 1 }, { name: "idx_metadata_score" });
 
 
 // =========================================================================================
