@@ -5,6 +5,14 @@ import time
 import os
 import mysql.connector
 import redis
+import pymongo
+import logging
+from cassandra.cluster import Cluster
+from neo4j import GraphDatabase
+from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = FastAPI(title="Seed Service")
 
@@ -26,6 +34,36 @@ def get_redis_conn():
     try:
         return redis.Redis(host=os.environ.get('REDIS_HOST','redis'), port=int(os.environ.get('REDIS_PORT',6379)), db=0, socket_connect_timeout=2)
     except Exception:
+        return None
+
+def get_mongo_conn():
+    try:
+        client = pymongo.MongoClient(host=os.environ.get('MONGO_HOST', 'mongodb'),
+                                     port=int(os.environ.get('MONGO_PORT', 27017)),
+                                     username=os.environ.get('MONGO_USER', 'rootuser'),
+                                     password=os.environ.get('MONGO_PASS', 'rootpassword'),
+                                     authSource='admin')
+        return client[os.environ.get('MONGO_DB', 'starbucks_transactions')]
+    except Exception as e:
+        logging.error(f"Could not connect to MongoDB: {e}")
+        return None
+
+def get_cassandra_conn():
+    try:
+        cluster = Cluster([os.environ.get('CASSANDRA_HOST', 'cassandra')])
+        session = cluster.connect()
+        return session
+    except Exception as e:
+        logging.error(f"Could not connect to Cassandra: {e}")
+        return None
+
+def get_neo4j_driver():
+    try:
+        driver = GraphDatabase.driver(f"bolt://{os.environ.get('NEO4J_HOST', 'neo4j')}:7687",
+                                      auth=(os.environ.get('NEO4J_USER', 'neo4j'), os.environ.get('NEO4J_PASS', 'neo4jpassword')))
+        return driver
+    except Exception as e:
+        logging.error(f"Could not connect to Neo4j: {e}")
         return None
 
 
@@ -87,7 +125,7 @@ def generate_order(req: GenerateRequest | None = None):
                 qty = 1
                 if p.get('cantidad') and p['cantidad'] > 1:
                     qty = random.randint(1, min(3, p['cantidad']))
-                items.append({'product_id': int(p['id']), 'cantidad': int(qty), 'precio': round(p['precio'] * qty, 2)})
+                items.append({'product_id': int(p['id']), 'nombre': p['nombre'], 'cantidad': int(qty), 'precio': round(p['precio'] * qty, 2)})
                 pool = [x for x in pool if x['id'] != p['id']]
 
         # total
@@ -108,18 +146,101 @@ def generate_order(req: GenerateRequest | None = None):
         # If ticket_id not obtained via Redis, fallback to timestamp-based.
         if ticket_id is None:
             ticket_id = int(time.time() * 1000)
-        fecha = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        
+        fecha_str = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        fecha_dt = datetime.fromisoformat(fecha_str.replace('Z', '+00:00'))
 
-        return {
+
+        order = {
             'ticket_id': ticket_id,
             'sucursal_id': int(sucursal_id) if sucursal_id is not None else None,
             'cliente_id': int(cliente_id) if cliente_id is not None else None,
-            'fecha': fecha,
+            'fecha': fecha_str,
             'total': total,
             'metodo_pago': metodo_pago,
             'promocion_id': promocion_id,
             'detalles': items
         }
+
+        # Insert into MongoDB
+        mongo_db = get_mongo_conn()
+        if mongo_db is not None:
+            try:
+                # MongoDB wants datetime objects for ISODate
+                order_for_mongo = order.copy()
+                order_for_mongo['fecha'] = fecha_dt
+                result = mongo_db.ticket.insert_one(order_for_mongo)
+                logging.info(f"Inserted order {result.inserted_id} into MongoDB.")
+            except Exception as e:
+                logging.error(f"Failed to insert order into MongoDB: {e}")
+
+        # Insert into Cassandra
+        cassandra_session = get_cassandra_conn()
+        if cassandra_session is not None:
+            try:
+                cql = "INSERT INTO starbucks_analytics.historialcompra (idSucursal, fecha, ticket_num) VALUES (%s, %s, %s)"
+                cassandra_session.execute(cql, (sucursal_id, fecha_dt, ticket_id))
+                logging.info(f"Inserted order {ticket_id} into Cassandra.")
+            except Exception as e:
+                logging.error(f"Failed to insert order into Cassandra: {e}")
+            finally:
+                cassandra_session.cluster.shutdown()
+
+        # Update MySQL Stock
+        try:
+            cur2 = conn.cursor()
+            for it in items:
+                pid = it.get('product_id')
+                qty = it.get('cantidad', 1)
+                if pid is not None:
+                    cur2.execute('UPDATE Stock SET cantidad = GREATEST(0, cantidad - %s) WHERE idSucursal = %s AND idProducto = %s', (qty, sucursal_id, pid))
+            conn.commit()
+            logging.info(f"Updated stock in MySQL for ticket {ticket_id}.")
+            cur2.close()
+        except Exception as e:
+            logging.error(f"Failed to update stock in MySQL: {e}")
+
+        # Update Neo4j
+        neo4j_driver = get_neo4j_driver()
+        if neo4j_driver is not None:
+            try:
+                with neo4j_driver.session() as s:
+                    # First, ensure the client exists
+                    s.run("MERGE (c:Cliente {id: $id}) SET c.last_seen = $ts, c.name = coalesce(c.name, $name)", 
+                          id=cliente_id, ts=fecha_str, name=f'Cliente {cliente_id}')
+                    
+                    # Then, create the purchase relationships for each product in the order
+                    for item in items:
+                        s.run("""
+                            MERGE (c:Cliente {id: $cliente_id})
+                            MERGE (p:Producto {id: $product_id})
+                            ON CREATE SET p.nombre = $product_name
+                            CREATE (c)-[:COMPRO {ticket_id: $ticket_id, fecha: $fecha, cantidad: $cantidad}]->(p)
+                        """, {
+                            "cliente_id": cliente_id,
+                            "product_id": item['product_id'],
+                            "product_name": item['nombre'],
+                            "ticket_id": ticket_id,
+                            "fecha": fecha_str,
+                            "cantidad": item['cantidad']
+                        })
+                    logging.info(f"Created purchase relationships in Neo4j for ticket {ticket_id}.")
+            except Exception as e:
+                logging.error(f"Failed to update Neo4j: {e}")
+            finally:
+                neo4j_driver.close()
+
+        # Update Redis
+        if rconn is not None:
+            try:
+                rconn.set(f'last_ticket:sucursal:{sucursal_id}', ticket_id)
+                rconn.incr('counter:tickets')
+                logging.info(f"Updated Redis for ticket {ticket_id}.")
+            except Exception as e:
+                logging.error(f"Failed to update Redis: {e}")
+
+
+        return order
 
     finally:
         try:
@@ -127,3 +248,4 @@ def generate_order(req: GenerateRequest | None = None):
                 conn.close()
         except Exception:
             pass
+

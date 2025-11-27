@@ -33,11 +33,12 @@ echo "--- All core databases are running. Starting initialization scripts. ---"
 # to be installed in the Dockerfile above. Assuming they are available.
 
 # MySQL Setup
-echo "Running MySQL setup..."
+echo "--- Running MySQL setup... ---"
 mysql -h mysql -u root -proot_password my_data_warehouse < /setup_scripts/01_mysql_init.sql
-echo "MySQL setup finished"
+echo "--- MySQL setup finished ---"
+
 # MongoDB Setup
-echo "Running MongoDB setup..."
+echo "--- Running MongoDB setup... ---"
 MONGO_USER="rootuser" 
 MONGO_PASS="rootpassword"
 
@@ -47,12 +48,14 @@ mongosh mongodb://mongodb:27017/starbucks_transactions \
     -p "$MONGO_PASS" \
     --authenticationDatabase "admin" \
     --file /setup_scripts/02_mongodb_init.js
-echo "MongoDB setup finished"
+echo "--- MongoDB setup finished ---"
+
 # Cassandra Setup
-echo "Running Cassandra setup..."
+echo "--- Running Cassandra setup... ---"
 # Use cqlsh to execute the script
 cqlsh -f /setup_scripts/03_cassandra_init.cql cassandra 9042
-echo "Cassandra setup finished"
+echo "--- Cassandra setup finished ---"
+
 # Neo4j Setup
 # Variables de conexión
 NEO4J_URI="bolt://neo4j:7687"
@@ -60,13 +63,13 @@ NEO4J_USER="neo4j"
 NEO4J_PASS="neo4jpassword"
 NEO4J_DB_NAME="neo4j"
 
-echo "Running Neo4j setup..."
+echo "--- Running Neo4j setup... ---"
 
 # 2. Inicializar la base de datos 'mydata'
 echo "Initializing data in ${NEO4J_DB_NAME}..."
 cat /setup_scripts/04_neo4j_init.cypher | cypher-shell -a "${NEO4J_URI}" -u "${NEO4J_USER}" -p "${NEO4J_PASS}" --database "${NEO4J_DB_NAME}"
 
-echo "Neo4j setup finished"
+echo "--- Neo4j setup finished ---"
 
 # Redis Configuration (Optional: Apply configuration via CLI if needed, otherwise skip)
 echo "Redis configuration applied via Docker Compose command (or skipped)."

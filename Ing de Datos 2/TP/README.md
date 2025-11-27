@@ -20,7 +20,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 | **`redis`** | Redis | **Cache:** Almacenamiento volátil para la sesión del usuario o *cache* de menús. |
 | **`cli`** | Python (Rich) | **Interfaz TUI:** Herramienta para ejecutar y demostrar las *queries* de negocio en cada BD. |
 | **`setup_service`** | Bash/Python/Shells de BD | **Inicialización:** Script que espera por la disponibilidad de todas las BD e inyecta los datos iniciales y la estructura. |
-| **`seed_service`**| Python (FastAPI) | **Generador de Datos:** Servicio que genera datos de prueba (órdenes, clientes, etc.) bajo demanda a través de una API. |
+| **`seed_service`**| Python (FastAPI) | **Generador de Datos:** Servicio que genera órdenes y las propaga a todas las bases de datos (MongoDB, Cassandra, MySQL, Neo4j, Redis), registrando los inserts y updates. |
 
 ![Arquitectura Políglota](Arquitectura.png)
 
@@ -33,9 +33,8 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 ├── casos_de_uso.txt            # Documento que detalla los requisitos y casos de uso.
 ├── cli/                        # Entorno y código de la Interfaz TUI (Terminal User Interface).
 │   ├── cli_v2.py               # Lógica principal de la TUI, con navegación por directorios.
-│   ├── cli_v3.py               # Script alternativo que inicia la TUI y un generador de datos en segundo plano.
-│   ├── Dockerfile              # Define la imagen para el servicio CLI.
-│   └── queries/                # Carpeta vacía utilizada como punto de montaje en Docker.
+│   ├── cli_v3.py               # Script alternativo que inicia la TUI y un generador de datos en segundo plano, interactuando con el seed_service.
+│   └── Dockerfile              # Define la imagen para el servicio CLI.
 ├── DER_Definitivo.png          # Diagrama Entidad-Relación (DER) definitivo.
 ├── DER.puml                    # Archivo fuente PlantUML para el DER.
 ├── docker-compose.yml          # Definición y orquestación de todos los servicios con Docker Compose.
@@ -91,7 +90,7 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
 
 1.  **Construir y Lanzar los Contenedores:**
     Este comando construye la imagen `cli` y levanta todos los servicios, incluido el `setup_service` que inicializará las bases de datos.
-
+    Dejando el `seed_service` listo para generar y propagar informacion.
     ```bash
     docker compose up --build
     ```
@@ -113,14 +112,20 @@ El *setup* completo se orquesta mediante **Docker Compose**, y se incluye una **
         ```
 
     *   **Opción B (Con Generador de Datos):**
-        Inicia la TUI y, en segundo plano, un generador automático de transacciones para simular un entorno dinámico.
+        Inicia la TUI y, en segundo plano, un generador automático de transacciones que llama al `seed_service` para simular un entorno dinámico y propagar los datos a las distintas bases de datos.
         ```bash
         docker compose exec cli python cli_v3.py
         ```
 
     *Dentro de la TUI, puedes navegar por los directorios para encontrar el script que deseas ejecutar. Simplemente escribe el ID del script o directorio para seleccionarlo.*
 
-4.  **Detener y Limpiar:**
+4.  **Verificar Logs del Generador de Datos (`seed_service`):**
+    Para ver los logs del `seed_service` (que incluyen los inserts y updates en las diferentes bases de datos), usa:
+    ```bash
+    docker compose logs seed_service
+    ```
+
+5.  **Detener y Limpiar:**
     Para detener todos los servicios y eliminar los contenedores y volúmenes (si usaste `-v` en `down`), usa:
 
     ```bash

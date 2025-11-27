@@ -150,23 +150,6 @@ db.ticket.insertMany([
   },
 ]);
 
-db.ticket.insertOne({
-  ticket_id: "TKT-2025-001",
-  cliente_id: 101,
-  cliente_nombre: "Ana Garcia",
-  sucursal_id: 3,
-  sucursal_ciudad: "Buenos Aires",
-  fecha: new Date("2025-11-05T10:30:00Z"),
-  total: 6.50,
-  metodo_pago: "Tarjeta",
-  promocion_id: 201,
-  nombre_promocion: "Desc. Mañana",
-  detalles: [
-    { producto_id: 1, nombre_producto: "Latte", precio_historico: 4.50, cantidad: 1 },
-    { producto_id: 2, nombre_producto: "Muffin", precio_historico: 2.00, cantidad: 1 }
-  ]
-});
-
 db.canje.insertMany([
     {
   cliente_id: 2,

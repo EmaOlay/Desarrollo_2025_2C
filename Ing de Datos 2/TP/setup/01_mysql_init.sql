@@ -108,8 +108,10 @@ INSERT IGNORE INTO Cliente (id, nombre, email, telefono, domicilio, saldo, stars
 (103, 'Carlos Sanchez', 'carlos.sanchez@example.com', '555-9999', '40 Maple St', 50.00, 8, CURDATE(), 'Activo');
 
 -- Inserta una promoción. Si la promoción ya existe, la ignora.
-INSERT IGNORE INTO Promocion (nombre, tipo, descuento, pais, fechaInicio, fechaFin) VALUES
-('Happy Hour', 'Porcentaje', 0.10, 'USA', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY));
+INSERT IGNORE INTO Promocion (id, nombre, tipo, descuento, pais, fechaInicio, fechaFin) VALUES
+(1, 'Happy Hour', 'Porcentaje', 0.10, 'USA', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY)),
+(2, '2x1 en Muffins', '2x1', 3.00, 'Argentina', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 15 DAY)),
+(201, 'Desc. Mañana', 'Porcentaje', 0.15, 'Argentina', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 60 DAY));
 
 -- Inserta stock. Si la combinación de idSucursal e idProducto ya existe, la ignora.
 INSERT IGNORE INTO Stock (idSucursal, idProducto, cantidad) VALUES

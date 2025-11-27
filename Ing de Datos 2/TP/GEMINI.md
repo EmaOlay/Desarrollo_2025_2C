@@ -17,8 +17,8 @@ The project utilizes a polyglot persistence approach with the following services
 *   **Apache Cassandra:** Ideal for analytical and time-series data, recording purchase history (`HistorialCompra`) and system logs due to its high write frequency capabilities.
 *   **Neo4j:** A graph database for analyzing complex relationships, such as "most connected products" or customer recommendation networks.
 *   **Redis:** Functions as a caching layer for volatile data like user sessions or cached menus, enhancing performance.
-*   **CLI (Python with Rich):** A TUI for executing and demonstrating business queries across all integrated databases.
-*   **Setup Service:** A dedicated service responsible for initializing all databases and injecting initial data and schema structures.
+*   **CLI (Python with Rich):** A TUI for executing and demonstrating business queries across all integrated databases. The primary script is `cli/cli_v2.py`, with `cli/cli_v3.py` also present, possibly as a newer version.
+*   **Seed Service:** A dedicated service responsible for initializing all databases and injecting initial data and schema structures.
 
 ## Building and Running the Project
 
@@ -32,14 +32,14 @@ The project is designed to be built and run using Docker Compose.
 ### Execution Steps
 
 1.  **Build and Launch Containers:**
-    This command builds the `cli` image and brings up all services, including the `setup_service` which initializes the databases.
+    This command builds the `cli` image and brings up all services, including the `seed_service` which initializes the databases.
 
     ```bash
     docker compose up --build
     ```
 
 2.  **Verify Service Status:**
-    Ensure all services are in an `Up` state. The `setup_service` will likely show `Exited (0)` once its initialization tasks are complete.
+    Ensure all services are in an `Up` state. The `seed_service` will likely show `Exited (0)` once its initialization tasks are complete.
 
     ```bash
     docker compose ps
@@ -49,7 +49,7 @@ The project is designed to be built and run using Docker Compose.
     Once the databases are initialized and running, you can access the interactive TUI to execute queries.
 
     ```bash
-    docker compose exec cli python cli_v2.py
+    docker compose exec cli python cli/cli_v2.py
     ```
     *Inside the TUI, you can navigate through directories to find and execute specific scripts by entering their corresponding ID.*
 

@@ -109,6 +109,9 @@ services:
     depends_on:
       - mysql
       - redis
+      - mongodb
+      - cassandra
+      - neo4j
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_USER=root
@@ -116,6 +119,14 @@ services:
       - MYSQL_DB=my_data_warehouse
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - MONGO_HOST=mongodb
+      - MONGO_USER=rootuser
+      - MONGO_PASS=rootpassword
+      - MONGO_DB=starbucks_transactions
+      - CASSANDRA_HOST=cassandra
+      - NEO4J_HOST=neo4j
+      - NEO4J_USER=neo4j
+      - NEO4J_PASS=neo4jpassword
 # ----------------------------------------------
 # 4. La cli como servicio aparte
 # ----------------------------------------------

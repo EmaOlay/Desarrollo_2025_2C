@@ -2,3 +2,6 @@ fastapi
 uvicorn[standard]
 mysql-connector-python
 redis
+pymongo
+cassandra-driver
+neo4j

@@ -30,3 +30,6 @@ printjson(db.canje.find().toArray());
 
 print("\n--- Contenido de la colección 'MenuDiaCache' ---");
 printjson(db.MenuDiaCache.find().toArray());
+
+print("\n--- Mi busqueda en ticket ---");
+printjson(db.ticket.find({"cliente_id":103}).toArray());

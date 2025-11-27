@@ -35,6 +35,8 @@ RUN pip install redis
 # Instalación de la librería Rich (para TUI básico y formatting)
 RUN pip install rich
 
+RUN pip install requests
+
 # Copiamos el script principal de la TUI
 # COPY cli.py /app/cli.py
 
