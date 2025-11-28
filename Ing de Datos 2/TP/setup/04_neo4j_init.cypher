@@ -6,13 +6,13 @@ MATCH (n) DETACH DELETE n;
 // 2. Crear Nodos de Clientes
 CREATE (c1:Cliente {id: 1, nombre: 'Alice Johnson', email: 'alice@example.com'});
 CREATE (c2:Cliente {id: 2, nombre: 'Jhon Doe', email: 'john.doe@example.com'});
-CREATE (c3:Cliente {id: 101, nombre: 'Ana García', email: 'ana.garcia@example.com'});
+CREATE (c3:Cliente {id: 101, nombre: 'Ana Garcia', email: 'ana.garcia@example.com'});
 CREATE (c4:Cliente {id: 102, nombre: 'Juan Perez', email: 'juan.perez@email.com'});
 CREATE (c5:Cliente {id: 103, nombre: 'Carlos Sanchez', email: 'carlos.sanchez@example.com'});
 
 // 3. Crear Nodos de Productos
 CREATE (p1:Producto {id: 1, nombre: 'Latte', precio: 4.50, tipo: 'Bebida Caliente'});
-CREATE (p2:Producto {id: 2, nombre: 'Muffin', precio: 3.00, tipo: 'Panadería/Pasteleria'});
+CREATE (p2:Producto {id: 2, nombre: 'Muffin', precio: 3.00, tipo: 'Panaderia/Pasteleria'});
 CREATE (p3:Producto {id: 3, nombre: 'Frappuccino', precio: 5.50, tipo: 'Bebida Fria'});
 
 // 4. Crear Nodos de Sucursales
@@ -47,4 +47,3 @@ CREATE (c)-[:COMPRA {ticket_id: 4, cantidad: 2, fecha: datetime('2025-09-02T15:0
 MATCH (c:Cliente {id: 1}), (p1:Producto {id: 3}), (p2:Producto {id: 2}), (s:Sucursal {id: 3})
 CREATE (c)-[:COMPRA {ticket_id: 57, cantidad: 2, fecha: datetime('2025-09-01T15:00:00Z')}]->(p1),
        (c)-[:COMPRA {ticket_id: 57, cantidad: 1, fecha: datetime('2025-09-01T15:00:00Z')}]->(p2);
-

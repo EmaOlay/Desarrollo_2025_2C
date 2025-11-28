@@ -12,7 +12,6 @@ use("starbucks_transactions");
 print("Limpiando colecciones existentes...");
 db.ticket.drop();
 db.interaccion.drop();
-db.menudiacache.drop();
 db.canje.drop();
 
 print("--- 1. Creando Colecciones (si no existen) ---");
@@ -21,7 +20,6 @@ print("--- 1. Creando Colecciones (si no existen) ---");
 db.createCollection("ticket");
 db.createCollection("interaccion");
 db.createCollection("canje");
-db.createCollection("MenuDiaCache");
 
 print("--- 2. Creando Índices ---");
 
@@ -63,23 +61,6 @@ db.canje.createIndex({ cliente_id: 1, fecha_canje: -1 }, { name: "idx_cliente_fe
 
 // Índice 8: Búsquedas por el ítem canjeado
 db.canje.createIndex({ item_canjeado: 1 }, { name: "idx_item_canjeado" });
-
-
-// =========================================================================================
-// COLECCIÓN: MENUDIACACHE (Cache con TTL)
-// =========================================================================================
-
-// Índice 9: Índice TTL (Time-To-Live)
-// Hace que los documentos en esta colección expiren automáticamente 1 hora (3600 segundos)
-// después de la 'fecha_creacion', tal como lo definiste en el DER.
-db.MenuDiaCache.createIndex(
-  { fecha_creacion: 1 },
-  { expireAfterSeconds: 3600, name: "idx_ttl_1hr" }
-);
-
-// Índice 10: Para desestructurar y buscar eficientemente productos por su tipo
-db.MenuDiaCache.createIndex({ "productos.tipo": 1 }, { name: "idx_productos_tipo" });
-
 
 print("--- 3. Inicialización de datos de prueba (Opcional) ---");
 

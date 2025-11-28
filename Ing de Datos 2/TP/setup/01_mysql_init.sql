@@ -96,7 +96,7 @@ INSERT IGNORE INTO Sucursal (id, pais, ciudad, direccion, horario, capacidad) VA
 -- Inserta productos. Si un producto ya existe (ej. por nombre único), lo ignora.
 INSERT IGNORE INTO Producto (nombre, tipo, precio) VALUES
 ('Latte', 'Bebida Caliente', 4.50),
-('Muffin', 'Panadería/Pasteleria', 3.00),
+('Muffin', 'Panaderia/Pasteleria', 3.00),
 ('Frappuccino', 'Bebida Fria', 5.50);
 
 -- Inserta un cliente. Si el cliente ya existe (ej. por email único), lo ignora.
@@ -111,7 +111,7 @@ INSERT IGNORE INTO Cliente (id, nombre, email, telefono, domicilio, saldo, stars
 INSERT IGNORE INTO Promocion (id, nombre, tipo, descuento, pais, fechaInicio, fechaFin) VALUES
 (1, 'Happy Hour', 'Porcentaje', 0.10, 'USA', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY)),
 (2, '2x1 en Muffins', '2x1', 3.00, 'Argentina', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 15 DAY)),
-(201, 'Desc. Mañana', 'Porcentaje', 0.15, 'Argentina', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 60 DAY));
+(201, 'Desc. Manana', 'Porcentaje', 0.15, 'Argentina', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 60 DAY));
 
 -- Inserta stock. Si la combinación de idSucursal e idProducto ya existe, la ignora.
 INSERT IGNORE INTO Stock (idSucursal, idProducto, cantidad) VALUES
@@ -121,10 +121,10 @@ INSERT IGNORE INTO Stock (idSucursal, idProducto, cantidad) VALUES
 (2, 3, 60);
 
 INSERT INTO Tipo_Producto (idTipoProducto, descripcion) VALUES
-('Bebida Caliente', 'Bebidas servidas calientes, como Lattes, Capuccinos, Té.'),
-('Bebida Fria', 'Bebidas servidas frías, como Iced Lattes, Frappuccinos, Refrescos.'),
-('Panadería/Pastelería', 'Productos horneados, como muffins, croissants, tortas.'),
+('Bebida Caliente', 'Bebidas servidas calientes, como Lattes, Capuccinos, Te.'),
+('Bebida Fria', 'Bebidas servidas frias, como Iced Lattes, Frappuccinos, Refrescos.'),
+('Panaderia/Pasteleria', 'Productos horneados, como muffins, croissants, tortas.'),
 ('Snack', 'Pequeños alimentos para llevar, como barras de cereal o galletas.'),
-('Merchandising', 'Artículos no consumibles, como tazas, termos y accesorios.'),
-('Café en Grano', 'Bolsas de café para preparar en casa.'),
-('Desayuno/Almuerzo', 'Comidas más sustanciosas, como sándwiches o ensaladas.');
+('Merchandising', 'Articulos no consumibles, como tazas, termos y accesorios.'),
+('Cafe en Grano', 'Bolsas de cafe para preparar en casa.'),
+('Desayuno/Almuerzo', 'Comidas mas sustanciosas, como sandwiches o ensaladas.');
